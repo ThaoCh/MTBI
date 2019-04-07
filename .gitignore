@@ -1,0 +1,13 @@
+*.zip
+*.mat
+*.p
+*.nii
+.ipynb_checkpoints/
+.idea/
+__pycache__/
+mat_data/
+mat/
+Literature/
+BOW/
+MTBI/
+data/
