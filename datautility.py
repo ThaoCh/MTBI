@@ -3,27 +3,32 @@ import matplotlib.pyplot as plt
 from scipy.io import loadmat
 import nibabel as nib
 
-metric = ['ad', 'ak', 'awf', 'eas_De_par', 'eas_De_perp', 'eas_tort', 'FA', 'ias_Da', 'md', 'mk', 'rd', 'rk']
-mask_name = ['1_L_thal','2_R_thal','CC_Body_mask','CC_Genu_mask','CC_Splenium_mask']
-
-
-def get_subject_data(index, dict):
+def get_subject_data(index, image_dict, metric, verbose=False):
 	'''
 	for an index get an image unshffuled!
+	Args:
+		index: the index of image in image_dict in range [0, 154)
+		image_dict: the dict of image names
+		metric: the metric to obtain
+		verbose: print image out or not
+	Return:
+		data: ndarray, shape = (len(metric), X, Y, Z)
 	'''
-	assert (index > -1) and (index < 166)
+	assert (index > -1) and (index < 154)
 
-	if index < 67:
-		# positive of 117
-		pass
-	elif (index > 66) and (index < 117):
-		# negative of 117
-		pass
+	if index < 49:
+		# 49 old subjects
+		data = get_old_image (image_dict[index], metric, verbose=verbose)
+	elif (index < 106):
+		# 57 positive of 117
+		data = get_image (image_dict[index], metric, positive=True, verbose=verbose)
 	else:
-		# old subjects
-		pass
+		# 48 negative of 117
+		data = get_image (image_dict[index], metric, positive=False, verbose=verbose)
 
-def show_slice(data, N):
+	return data
+
+def show_slice(data, N, axis=0):
 	'''
 	data: 3d ndarray
 	N: number of slice taken at X axis
@@ -32,7 +37,14 @@ def show_slice(data, N):
 	fig, ax = plt.subplots(1, N, figsize=(15, 4), sharey=True)
 
 	for i,s in enumerate(slices):
-		ax[i].imshow(data[s], cmap='gray')
+		if axis==0:
+			ax[i].imshow(data[s], cmap='gray')
+		elif axis==1:
+			ax[i].imshow(data[:,s,:], cmap='gray')
+		else:
+			ax[i].imshow(data[:,:,s], cmap='gray')
+	pass
+
 
 def get_image(index, metric, positive, verbose=False):
 	'''
@@ -68,7 +80,7 @@ def get_old_image(index, metric, verbose=False):
 
 		if verbose:
 			show_slice(data_metric[i], N=8)
-
+			pass
 	return data_metric
 
 def get_mask(mask, verbose=False):
@@ -93,6 +105,7 @@ def savenii(img, img_name):
 	return:
 		* None
 	'''
+	img = np.squeeze(img)
 	filename = img_name + '.nii'
 	array_img = nib.Nifti1Image(img, np.eye(4))
 	nib.save(array_img, filename)
