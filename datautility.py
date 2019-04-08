@@ -3,6 +3,26 @@ import matplotlib.pyplot as plt
 from scipy.io import loadmat
 import nibabel as nib
 
+metric = ['ad', 'ak', 'awf', 'eas_De_par', 'eas_De_perp', 'eas_tort', 'FA', 'ias_Da', 'md', 'mk', 'rd', 'rk']
+mask_name = ['1_L_thal','2_R_thal','CC_Body_mask','CC_Genu_mask','CC_Splenium_mask']
+
+
+def get_subject_data(index, dict):
+	'''
+	for an index get an image unshffuled!
+	'''
+	assert (index > -1) and (index < 166)
+
+	if index < 67:
+		# positive of 117
+		pass
+	elif (index > 66) and (index < 117):
+		# negative of 117
+		pass
+	else:
+		# old subjects
+		pass
+
 def show_slice(data, N):
 	'''
 	data: 3d ndarray
