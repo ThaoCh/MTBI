@@ -5,7 +5,6 @@
 
 * 1st iter: 
 	* maximum test accuracy= 0.400, achieved by using 10 features and ( C, Gamma, eps)= ( 1000.000, 0.002, 0.050) from 14 metrics
-	* Selected feature for 3xiter= [228.  53. 239. 305.  10. 111. 197. 109. 275. 149.]
 	* ['3m-CC_Splenium_mask-ad' 'mean-CC_Splenium_mask-eas_tort'
 	 '3m-CC_Splenium_mask-rk' 'kut-1_L_thal-eas_tort' 'mean-1_L_thal-rd'
 	 'std-CC_Splenium_mask-eas_De_par' '3m-2_R_thal-eas_tort'
@@ -13,7 +12,6 @@
 
 * 2nd iter:
 	* maximum test accuracy= 0.502, achieved by using 20 features and ( C, Gamma, eps)= ( 1000.000, 0.002, 0.050) from 14 metrics
-	* Selected feature for 3xiter= [228.  53. 239. 305.  10. 111. 197.  19. 275. 149.  77.  47. 234. 235. 351. 112. 337. 109. 320. 236.]
 	* ['3m-CC_Splenium_mask-ad' 'mean-CC_Splenium_mask-eas_tort'
 	 '3m-CC_Splenium_mask-rk' 'kut-1_L_thal-eas_tort' 'mean-1_L_thal-rd'
 	 'std-CC_Splenium_mask-eas_De_par' '3m-2_R_thal-eas_tort'
@@ -27,7 +25,6 @@
 
 * 1st iter:
 	* maximum test accuracy= 0.300, achieved by using 10 features and ( C, Gamma, eps)= ( 1000.00000, 0.00178, 0.10000) from 14 metrics
-	* Selected feature for 3xiter= [341. 149. 358. 102. 269.  53. 335. 203.  41. 319.]
 	['kut-CC_Genu_mask-eas_tort' '2m-CC_Body_mask-eas_tort'
 	 'kut-CC_Splenium_mask-rd' 'std-CC_Genu_mask-FA'
 	 '4m-CC_Body_mask-eas_tort' 'mean-CC_Splenium_mask-eas_tort'
@@ -36,11 +33,6 @@
 
 * 2nd iter:
 	* maximum test accuracy= 0.404, achieved by using 58 features and ( C, Gamma, eps)= ( 1000.00000, 0.00178, 0.10000) from 14 metrics
-	* Selected feature for 3xiter= [341. 149. 358. 102. 269.  53. 335. 203.  41. 319.  13. 118. 114.  14.
-	355. 283. 337.  61. 277. 223. 212. 271. 357.  25. 214. 116. 254. 104.
-	211.  42. 350. 343. 115. 331. 157. 213. 328.  67. 158. 187. 152. 284.
-	332. 153. 154. 278. 279. 195.  87.  63.  70. 189. 183.  69.  64. 190.
-	184.  45.]
 	* ['kut-CC_Genu_mask-eas_tort' '2m-CC_Body_mask-eas_tort'
 	 'kut-CC_Splenium_mask-rd' 'std-CC_Genu_mask-FA'
 	 '4m-CC_Body_mask-eas_tort' 'mean-CC_Splenium_mask-eas_tort'
@@ -78,11 +70,6 @@
 
 * 2nd iter:
 	* maximum test accuracy= 0.552, achieved by using 59 features and ( C, Gamma, eps)= ( 1000.00000, 0.00178, 0.10000) from 14 metrics
-	* Selected feature for 3xiter= [216. 107. 165. 358. 149.  71. 359.  41.  53. 319.  29. 222. 275. 173.
-	 102. 210. 138.  55. 180. 331. 237.  32. 339.  66. 332.  56. 182. 225.
-	 193.  81. 183.  68. 190.  70.  64. 184. 189.  63.  76.  88. 273. 274.
-	  69.  87.  75. 279.  51. 153. 340.  39. 196. 201.  74. 280. 194.  34.
-	 334.  82. 286.]
 	* ['3m-CC_Genu_mask-ad' 'std-CC_Genu_mask-rk' '2m-CC_Genu_mask-mk'
 	 'kut-CC_Splenium_mask-rd' '2m-CC_Body_mask-eas_tort' 'std-1_L_thal-rk'
 	 'kut-CC_Splenium_mask-rk' 'mean-CC_Genu_mask-eas_tort'
@@ -111,16 +98,12 @@
 # Combine - Digit Span Backward T1
 
 maximum test accuracy= 0.323, achieved by using 10 features and ( C, Gamma, eps)= ( 31.62278, 0.31623, 0.50000) from 14 metrics
-Selected feature for 3xiter= [210. 209. 104. 105. 174. 149. 357. 349. 139. 318.]
 ['3m-CC_Body_mask-FA' '3m-CC_Body_mask-eas_tort' 'std-CC_Genu_mask-md'
  'std-CC_Genu_mask-mk' '2m-CC_Splenium_mask-FA' '2m-CC_Body_mask-eas_tort'
  'kut-CC_Splenium_mask-mk' 'kut-CC_Splenium_mask-ak' '2m-2_R_thal-ias_Da'
  'kut-2_R_thal-FA']
 
  maximum test accuracy= 0.368, achieved by using 30 features and ( C, Gamma, eps)= ( 31.62278, 0.31623, 0.50000) from 14 metrics
-Selected feature for 3xiter= [210. 209. 104. 105. 174. 149. 357. 349. 139. 318. 325. 289. 237.  14.
- 133. 140. 134. 238.  26. 157. 259. 313. 220.  19. 270. 337. 319. 236.
-  67. 339.]
 ['3m-CC_Body_mask-FA' '3m-CC_Body_mask-eas_tort' 'std-CC_Genu_mask-md'
  'std-CC_Genu_mask-mk' '2m-CC_Splenium_mask-FA' '2m-CC_Body_mask-eas_tort'
  'kut-CC_Splenium_mask-mk' 'kut-CC_Splenium_mask-ak' '2m-2_R_thal-ias_Da'
