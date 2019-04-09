@@ -3,7 +3,46 @@ import matplotlib.pyplot as plt
 from scipy.io import loadmat
 import nibabel as nib
 
-def get_subject_data(index, image_dict, metric, verbose=False):
+def get_label_new(index):
+
+	assert (index < 117) and (index > -1) 
+
+	if label < 67:
+		return 1
+	else:
+		return 0
+
+def get_label_all(index):
+
+	assert (index > -1) and (index < 154)
+
+	if label < 27:
+		return 1
+	elif label < 49:
+		return 0
+	elif label < 106:
+		return 1
+	else:
+		return 0
+
+def get_subject_data_new(index, image_dict, metric, verbose=False):
+	'''
+	for an index get an image
+	index: [0-117]
+	'''
+
+	assert (index < 117) and (index > -1) 
+
+	if index < 67:
+		# positive
+		data = get_image (image_dict[index], metric, positive=True, verbose=verbose)
+	else:
+		# index => 67 < 117, negative	
+		data = get_image (image_dict[index], metric, positive=False, verbose=verbose)
+
+	return data
+
+def get_subject_data_all(index, image_dict, metric, verbose=False):
 	'''
 	for an index get an image unshffuled!
 	Args:
@@ -45,13 +84,12 @@ def show_slice(data, N, axis=0):
 			ax[i].imshow(data[:,:,s], cmap='gray')
 	pass
 
-
 def get_image(index, metric, positive, verbose=False):
 	'''
-	get negative sample of 117 data
+	get sample of 117 data
 	'''
 	M = len(metric)
-	data_metric = np.zeros([M, 182, 218, 182])
+	data_metric = np.zeros([M, 182, 218, 182], dtype=np.float32)
 
 	for i, m in enumerate(metric):
 		if positive:
@@ -72,9 +110,10 @@ def get_image(index, metric, positive, verbose=False):
 
 def get_old_image(index, metric, verbose=False):
 	M = len(metric)
-	data_metric = np.zeros([M, 182, 218, 182])
+	data_metric = np.zeros([M, 182, 218, 182], dtype=np.float32)
 
 	for i, m in enumerate(metric):
+		# special, need a +1 to correspond to the correct file
 		PATH = './data/prior_cycle_subj_all_DKI_metrics/mat/'+m+'_priorsubj'+'{:02}'.format(index+1)+'.mat'
 		data_metric[i] = loadmat(PATH)['vol']
 

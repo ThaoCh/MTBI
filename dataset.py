@@ -4,56 +4,6 @@ from torch.utils.data import Dataset
 from scipy.ndimage import affine_transform
 from niiutility import loadnii
 
-def loadbvmask(img):
-	'''
-	Truely stupid and brutal force way to Find mask of BV
-	'''
-	img = (img > 0.66).astype(np.float32)
-	# BVmask.shape = 1, X, Y, Z
-
-	_, X, Y, Z = img.shape
-	x1, y1, z1 = 0, 0, 0
-	x2, y2, z2 = X-1, Y-1, Z-1
-
-	while x1 < X:
-		if (np.sum(img[:,x1,:,:]) > 0): # ~take a slice and check!
-			break
-		else:
-			x1 += 1
-
-	while y1 < Y:
-		if (np.sum(img[:,:,y1,:]) > 0):
-			break
-		else:
-			y1 += 1
-
-	while z1 < Z:
-		if (np.sum(img[:,:,:,z1]) > 0):
-			break
-		else:
-			z1 += 1
-
-	while x2 > 0:
-		if (np.sum(img[:,x2,:,:]) > 0): 
-			break
-		else:
-			x2 -= 1
-
-	while y2 > 0:
-		if (np.sum(img[:,:,y2,:]) > 0): 
-			break
-		else:
-			y2 -= 1
-
-	while z2 > 0:
-		if (np.sum(img[:,:,:,z2]) > 0): 
-			break
-		else:
-			z2 -= 1
-
-	return np.array([x1, x2-x1, y1, y2-y1, z1, z2-z1])
-
-
 def toTensor (sample):
 	'''
 	Notes:
@@ -230,7 +180,7 @@ class niiDataset(Dataset):
 	'''
 	pytorch dataset for bv segmentation
 	'''
-	def __init__(self, index, transform=None):
+	def __init__(self, img_dict, metric, transform=None, mode='new'):
 		'''
 		Args:
 			index of int
@@ -238,21 +188,30 @@ class niiDataset(Dataset):
 			transform(callable, default=none): transfrom on a sample
 		'''
 
-		self.index=index		
+		self.img_dict=img_dict
+		self.metric = metric	
 		self.transform=transform
+		self.mode = mode
 
 	def __len__(self):
 		'''
 		Override: return size of dataset
 		'''
-		return (self.index).shape[0]
+		return (self.img_dict).shape[0]
 
 	def __getitem__(self, indice):
 		'''
 		Override: integer indexing in range from 0 to len(self) exclusive.
 		type: keep as np array
 		'''
-		image, label = loadnii(self.index[indice], 192, 256, 256)
+		if mode=='new':
+			image = get_subject_data_new(indice, self.img_dict, self.metric, verbose=False)
+			label = get_label_new(indice)
+		else:
+			# mode == all
+			image = get_subject_data_all(indice, self.img_dict, self.metric, verbose=False)
+			label = get_label_all(indice)
+
 		sample = {'image':image, 'label':label}
 
 		if self.transform:
@@ -262,112 +221,3 @@ class niiDataset(Dataset):
 
 		return sample
 
-class niiMaskDataset(Dataset):
-
-    def __init__(self, index, transform=None):
-        self.index=index
-        self.transform=transform
-        
-    def __len__(self):
-        '''
-        Override: return size of dataset
-        '''
-        return (self.index).shape[0]
-
-    def __getitem__(self, indice):
-        image, label = loadnii(self.index[indice], 128, 192, 192, mode='pad')
-        sample = {'image':image, 'label':label}
-
-        # data are numpy array at this point
-
-        if self.transform:
-            sample = self.transform(sample)
-
-        sample = toTensor(sample)
-        
-        imageTensor = sample['image']
-        bodyMask = sample['label'].narrow(0, 1, 1)
-        bvMask = sample['label'].narrow(0, 2, 1)
-        bodyMask = torch.round(bodyMask)
-        imageTensor = imageTensor - torch.mean(imageTensor)
-        imageTensor = imageTensor*bodyMask
-        
-        sample = {'image':imageTensor, 'label':bvMask}
-
-        return sample
-
-class BvMaskDataset(Dataset):
-
-    def __init__(self, index, transform=None):
-        self.index=index
-        self.transform=transform
-        
-    def __len__(self):
-        '''
-        Override: return size of dataset
-        '''
-        return (self.index).shape[0]
-
-    def __getitem__(self, indice):
-        image, label = loadnii(self.index[indice], 128, 192, 192, mode='pad')
-        sample = {'image':image, 'label':label}
-
-        # data are numpy array at this point
-
-        if self.transform:
-            sample = self.transform(sample)
-
-        BBox = loadbvmask(sample['label'])
-        BBox = torch.from_numpy(BBox)
-        # Get the BBox ground truth
-
-        sample = toTensor(sample)
-        imageTensor = sample['image']
-        bvMask = sample['label'].narrow(0, 2, 1)
-        # Get the image tensor
-        
-        # bodyMask = sample['label'].narrow(0, 1, 1)
-        # bodyMask = torch.round(bodyMask)
-        # imageTensor = imageTensor - torch.mean(imageTensor)
-        # imageTensor = imageTensor*bodyMask
-        
-        sample = {'image':imageTensor, 'label':BBox}
-
-        return sample
-
-
-class niiPatchDataset(Dataset):
-	'''
-	patched dataset for bv segmentation
-	'''
-	def __init__(self, index, transform=None):
-		self.index = index
-		self.transform=transform
-
-	def __len__(self):
-		return (self.index).shape[0]*2*3*3
-
-	def __getitem__(self, indice):
-		
-		image_indice = indice//(2*3*3)
-		indice = indice%(2*3*3)
-
-		h_index = indice//(3*3)
-		indice = indice%(3*3)
-
-		w_index = indice//3
-		d_index = indice%3
-
-		image, label = loadnii(self.index[indice], 192, 256, 256)
-
-		image_sample = image[:, 64*h_index:64*(h_index+1), 64*w_index:64*(w_index+1) \
-			, 64*d_index:64*(d_index+1)]
-
-		label_sample = label[:, 64*h_index:64*(h_index+1), 64*w_index:64*(w_index+1) \
-			, 64*d_index:64*(d_index+1)]
-
-		label_sample = label_sample - torch.mean(label_sample)
-
-		sample = {'image':image_sample, 'label':label_sample}
-		sample = toTensor(sample)
-		return sample
