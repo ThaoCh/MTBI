@@ -6,7 +6,7 @@ Args:
 Out:
 	* Y of [BatchSize, NumClasses, X-dim, Y-dim, Z-dim]
 Source: 
-	* This vnet.py implement forked from https://github.com/mattmacy/vnet.pytorch
+	* This a modification of vnet.py implement forked from https://github.com/mattmacy/vnet.pytorch
 Bug fix: 
 	* Broadcasting bug in class InputTransition
 	* ContBatchNorm3d substituded with native
@@ -75,7 +75,6 @@ def _make_rConv(nchan ,depth, elu):
 		layers.append(ResLUConv(nchan, elu))
 	return nn.Sequential(*layers)
 
-
 def _make_nConv(nchan, depth, elu):
 	'''
 	Notes:	
@@ -95,7 +94,7 @@ class InputTransition(nn.Module):
 	'''
 	def __init__(self, outChans, elu):
 		super(InputTransition, self).__init__()
-		self.conv1 = nn.Conv3d(1, outChans, kernel_size=5, padding=2)
+		self.conv1 = nn.Conv3d(12, outChans, kernel_size=5, padding=2)
 		self.bn1 = nn.BatchNorm3d(outChans)
 		self.relu1 = ELUCons(elu, outChans)
 
@@ -195,28 +194,29 @@ class LNet(nn.Module):
 	'''
 	Half V Net
 	'''
-	def __init__(self, img_size, out_size=6, elu=True):
+	def __init__(self, img_size, out_size=1, elu=True):
 		'''
 		Args:
 			* slim: using few conv layers, else as original paper
 			* elu: using elu / PReLU
 		'''
+		# 64*96*64 -> 4*6*4
 		super(LNet, self).__init__()
 
 		x, y, z = img_size
 
-		self.in_tr = InputTransition(16, elu)
-		self.down_tr32 = DownTransition(16, 2, elu, dropout=True) # /2
-		self.down_tr64 = DownTransition(32, 3, elu, dropout=True) # /4
-		self.down_tr128 = DownTransition(64, 3, elu, dropout=True) # /8
-		self.down_tr256 = DownTransition(128, 3, elu, dropout=True) # /16
-		self.down_tr512 = DownTransition(256, 4, elu, dropout=True) # /32
-		self.gap = nn.AvgPool3d(kernel_size = (x//32,y//32,z//32)) # N, C, 1, 1, 1
+		self.in_tr = InputTransition(24, elu)
+		self.down_tr32 = DownTransition(48, 2, elu, dropout=True) # /2
+		self.down_tr64 = DownTransition(96, 3, elu, dropout=True) # /4
+		self.down_tr128 = DownTransition(192, 3, elu, dropout=True) # /8
+		self.down_tr256 = DownTransition(384, 4, elu, dropout=True) # /16
+		self.gap = nn.AvgPool3d(kernel_size = (x//16,y//16,z//16)) # N, C, 1, 1, 1
 
-		channel_num = 512
+		channel_num = 384
 
 		self.fc1 = FCRB(channel_num, channel_num)
 		self.fc2 = nn.Linear(channel_num, out_size)
+		self.sigmoid = nn.Sigmoid()
 
 	def forward(self, x):
 
@@ -227,183 +227,11 @@ class LNet(nn.Module):
 		out = self.down_tr64(out)
 		out = self.down_tr128(out)
 		out = self.down_tr256(out)
-		out = self.down_tr512(out)
-
 		out = self.gap(out)
 		out = out.view(batch_size, -1)
 
 		out = self.fc1(out)
 		out = self.fc2(out)
+		out = self.sigmoid(out)
 
 		return out
-
-
-class DVNet(nn.Module):
-	'''
-	Deep V NET for 192 256 256 FULL FUCKING SIZE
-	'''
-
-	def __init__(self, classnum=1, elu=True):
-		super(DVNet, self).__init__()
-
-		self.in_tr = InputTransition(8, elu)
-
-		self.down_tr16 = DownTransition(8, 2, elu, dropout=True)
-		self.down_tr32 = DownTransition(16, 2, elu, dropout=True)
-		self.down_tr64 = DownTransition(32, 3, elu, dropout=True)
-		self.down_tr128 = DownTransition(64, 3, elu, dropout=True)
-		self.down_tr256 = DownTransition(128, 3, elu, dropout=True)
-
-		self.up_tr256 = UpTransition(256, 256, 6, elu, dropout=True)
-		self.up_tr128 = UpTransition(256, 128, 3, elu, dropout=True)
-		self.up_tr64 = UpTransition(128, 64, 2, elu, dropout=True)
-		self.up_tr32 = UpTransition(64, 32, 2, elu, dropout=True)
-		self.up_tr16 = UpTransition(32, 16, 2, elu, dropout=True)
-
-		self.out_tr = OutputTransition(16, classnum ,elu)
-
-	def forward(self, x):
-
-		out8 = self.in_tr(x)
-		out16 = self.down_tr16(out8)
-		out32 = self.down_tr32(out16)
-		out64 = self.down_tr64(out32)
-		out128 = self.down_tr128(out64)
-		out256 = self.down_tr256(out128)
-		out = self.up_tr256(out256, out128)
-		out = self.up_tr128(out, out64)
-		out = self.up_tr64(out, out32)
-		out = self.up_tr32(out, out16)
-		out = self.up_tr16(out, out8)
-		out = self.out_tr(out)
-
-
-class VNet(nn.Module):
-	'''
-	Note:
-		VNet architecture As diagram of paper
-	'''
-	def __init__(self, classnum=1, slim=True, elu=True):
-		'''
-		Args:
-			* slim: using few conv layers, else as original paper
-			* elu: using elu / PReLU
-		'''
-		super(VNet, self).__init__()
-
-		self.slim=slim
-
-		if slim:
-			# 1 1 2 6 2 1 
-			self.in_tr = InputTransition(16, elu)
-			self.down_tr32 = DownTransition(16, 2, elu)
-			self.down_tr64 = DownTransition(32, 2, elu)
-			self.down_tr128 = DownTransition(64, 2, elu, dropout=True)
-			self.up_tr128 = UpTransition(128, 128, 6, elu, dropout=True)
-			self.up_tr64 = UpTransition(128, 64, 2, elu)
-			self.up_tr32 = UpTransition(64, 32, 2, elu)
-			self.out_tr = OutputTransition(32, classnum, elu)
-
-		else:
-			
-			
-			self.in_tr = InputTransition(16, elu)
-			self.down_tr32 = DownTransition(16, 2, elu, dropout=True)
-			self.down_tr64 = DownTransition(32, 3, elu, dropout=True)
-			self.down_tr128 = DownTransition(64, 3, elu, dropout=True)
-			self.down_tr256 = DownTransition(128, 3, elu, dropout=True)
-			self.up_tr256 = UpTransition(256, 256, 6, elu, dropout=True)
-			self.up_tr128 = UpTransition(256, 128, 3, elu, dropout=True)
-			self.up_tr64 = UpTransition(128, 64, 2, elu, dropout=True)
-			self.up_tr32 = UpTransition(64, 32, 2, elu, dropout=True)
-			self.out_tr = OutputTransition(32, classnum ,elu)
-			
-
-	def forward(self, x):
-
-		if self.slim:
-			out16 = self.in_tr(x)
-			out32 = self.down_tr32(out16)
-			out64 = self.down_tr64(out32)
-			out128 = self.down_tr128(out64)
-			out = self.up_tr128(out128, out64)
-			out = self.up_tr64(out, out32)
-			out = self.up_tr32(out, out16)
-			out = self.out_tr(out)
-
-		else:
-			pass
-			
-			out16 = self.in_tr(x)
-			out32 = self.down_tr32(out16)
-			out64 = self.down_tr64(out32)
-			out128 = self.down_tr128(out64)
-			out256 = self.down_tr256(out128)
-			out = self.up_tr256(out256, out128)
-			out = self.up_tr128(out, out64)
-			out = self.up_tr64(out, out32)
-			out = self.up_tr32(out, out16)
-			out = self.out_tr(out)
-			
-		return out
-
-class WNet(nn.Module):
-
-	def __init__(self):
-
-		super(WNet, self).__init__()
-		self.VNet1 = VNet()
-		self.VNet2 = VNet()
-
-	def forward(self, x):
-		body = self.VNet1(x)
-
-		bodyMask = (body-body.min())/(body.max()-body.min())
-		bodyMask = torch.round(bodyMask)
-
-		bv = self.VNet2(x*bodyMask)
-
-		return torch.cat((body, bv), 1)
-
-class VNetMask(nn.Module):
-	'''
-	Note:
-		VNet architecture As diagram of paper
-	'''
-	def __init__(self, elu=True):
-		'''
-		Args:
-			* slim: using few conv layers, else as original paper
-			* elu: using elu / PReLU
-		'''
-		super(VNetMask, self).__init__()
-
-		self.in_tr = InputTransition(16, elu)
-		self.down_tr32 = DownTransition(16, 1, elu)
-		self.down_tr64 = DownTransition(32, 1, elu)
-		self.down_tr128 = DownTransition(64, 2, elu, dropout=True)
-		self.up_tr128 = UpTransition(128, 128, 8, elu, dropout=True)
-		self.up_tr64 = UpTransition(128, 64, 2, elu)
-		self.up_tr32 = UpTransition(64, 32, 1, elu)
-		self.out_tr = OutputTransition(32, 3, elu) # BKG, Body Segmentation map
-
-	def forward(self, x):
-
-		out16 = self.in_tr(x)
-		out32 = self.down_tr32(out16)
-		out64 = self.down_tr64(out32)
-		out128 = self.down_tr128(out64)
-		out = self.up_tr128(out128, out64)
-		out = self.up_tr64(out, out32)
-		outfeature = self.up_tr32(out, out16)
-		outmap = self.out_tr(outfeature) # this is the the Body Segmentation map
-
-		outbkg = outmap.narrow(1, 0, 1)
-		outbody = outmap.narrow(1, 1, 1)
-		outbv = outmap.narrow(1, 2, 1)
-
-		bodymsk = (outbody-outbody.min())/(outbody.max()-outbody.min()) # remap the mask to [0, 1]
-
-		outbv = outbv*bodymsk 
-
-		return torch.cat((outbkg, outbody, outbv), 1)

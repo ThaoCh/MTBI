@@ -7,25 +7,67 @@ def get_label_new(index):
 
 	assert (index < 117) and (index > -1) 
 
-	if label < 67:
-		return 1
+	if index < 67:
+		return np.array ([1])
 	else:
-		return 0
+		return np.array ([0])
 
 def get_label_all(index):
 
 	assert (index > -1) and (index < 154)
 
-	if label < 27:
-		return 1
-	elif label < 49:
-		return 0
-	elif label < 106:
-		return 1
+	if index < 27:
+		return np.array ([1])
+	elif index < 49:
+		return np.array ([0])
+	elif index < 106:
+		return np.array ([1])
 	else:
-		return 0
+		return np.array ([0])
 
-def get_subject_data_new(index, image_dict, metric, verbose=False):
+def zero_padding (img, target_x, target_y, target_z):
+	"""
+	reshaping the img to desirable shape through zero pad or crop
+	Args:
+		* img: input ndarray (C, X, Y, Z)
+		* target_x: target shape x
+		* target_y: target shape y
+		* target_z: target shape z
+	Ret:
+		img: reshaped 3d nii array
+	"""
+
+	C = img.shape[0]
+
+	padx = (target_x-img.shape[1])//2
+	pady = (target_y-img.shape[2])//2
+	padz = (target_z-img.shape[3])//2
+
+	img_ret = np.zeros((C, target_x, target_y, target_z), dtype=np.float32)
+
+	for chan in np.arange(C):
+
+		if padx<0:
+			temp = img[chan,-padx:padx,:,:]
+		else:
+			temp = np.pad (img[chan], ((padx,padx),(0, 0),(0, 0)), \
+				mode='constant', constant_values=((0,0),(0,0),(0,0)))
+
+		if pady <0:
+			temp = temp[:,-pady:pady,:]
+		else:
+			temp = np.pad (temp, ((0,0),(pady, pady),(0, 0)), \
+				mode='constant', constant_values=((0,0),(0,0),(0,0)))
+
+		if padz <0:
+			temp = temp[:,:,-padz:padz]
+		else:
+			temp = np.pad (temp, ((0,0),(0, 0),(padz, padz)), \
+				mode='constant', constant_values=((0,0),(0,0),(0,0)))
+		img_ret[chan] = temp
+	return img_ret	
+
+def get_subject_data_new(index, image_dict, metric, shape, verbose=False):
 	'''
 	for an index get an image
 	index: [0-117]
@@ -40,7 +82,7 @@ def get_subject_data_new(index, image_dict, metric, verbose=False):
 		# index => 67 < 117, negative	
 		data = get_image (image_dict[index], metric, positive=False, verbose=verbose)
 
-	return data
+	return zero_padding (data, *shape)
 
 def get_subject_data_all(index, image_dict, metric, verbose=False):
 	'''
@@ -65,7 +107,7 @@ def get_subject_data_all(index, image_dict, metric, verbose=False):
 		# 48 negative of 117
 		data = get_image (image_dict[index], metric, positive=False, verbose=verbose)
 
-	return data
+	return zero_padding (data, *shape)
 
 def show_slice(data, N, axis=0):
 	'''

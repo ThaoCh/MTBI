@@ -2,7 +2,7 @@ import torch
 import numpy as np
 from torch.utils.data import Dataset
 from scipy.ndimage import affine_transform
-from niiutility import loadnii
+from datautility import *
 
 def toTensor (sample):
 	'''
@@ -18,20 +18,8 @@ def toTensor (sample):
 			labelTensor in [0, 1], (C=3, X, Y, X)
 	'''
 	image, label = sample['image'], sample['label']
-	imageTensor = torch.from_numpy(image-90)
-
-	labelOH = np.zeros((3, image.shape[1], image.shape[2], image.shape[3]) \
-		, dtype=np.float32)
-
-	labelOH[0:1] = (label < 0.33).astype(np.float32)
-	labelOH[1:2] = (label > 0.33).astype(np.float32)
-	labelOH[2:3] = (label > 0.66).astype(np.float32)
-
-	labelOH[1:2] -= labelOH[2:3]
-
-	labelTensor = torch.from_numpy(labelOH)
-
-	labelTensor = torch.round(labelTensor)
+	imageTensor = torch.from_numpy(image.copy()) # copy from memory to avoid minus stride
+	labelTensor = torch.from_numpy(label.copy())
 
 	return {'image': imageTensor, 'label': labelTensor}
 
@@ -41,12 +29,12 @@ def AffineFun(img, xr, yr, zr, xm, ym, zm, order):
 		Rotate and move
 		MoveToCenter->RotateX->RotateY->RotateZ->MoveBack->MoveRandom
 	Args:
-		img: image of shape (C=1, X, Y, Z)
+		img: image of shape (C, X, Y, Z)
 		xr, yr, zr: Rotate in degree
 		xm, ym, zm: move as int
 		order: 3 for image, 0 for label
 	Ret:
-		img: Transformed image of shape (C=1, X, Y, Z)
+		img: Transformed image of shape (C, X, Y, Z)
 	'''
 	sinx = np.sin(np.deg2rad(xr))
 	cosx = np.cos(np.deg2rad(xr))
@@ -69,7 +57,10 @@ def AffineFun(img, xr, yr, zr, xm, ym, zm, order):
 	MM = np.array([[1, 0, 0, xm],[0, 1, 0, ym],[0, 0, 1, zm],[0 ,0, 0, 1]])
 
 	Matrix = np.linalg.multi_dot([Mc, Rx, Ry, Rz, Mb, MM])
-	img[0] = affine_transform(img[0], Matrix, output_shape=img[0].shape, order=order)
+
+	C = img.shape[0]
+	for chan in np.arange(C):
+		img[chan] = affine_transform(img[chan], Matrix, output_shape=img[chan].shape, order=order)
 
 	return img
 
@@ -78,10 +69,10 @@ def filpFun(img, x, y, z):
 	Notes:
 		filp image
 	Args:
-		img: image of shape (C=1, X, Y, Z)
+		img: image of shape (C, X, Y, Z)
 		x, y, z: filp x ? filp y ? flip z ?
 	Ret:
-		img: Transformed image of shape (C=1, X, Y, Z)
+		img: Transformed image of shape (C, X, Y, Z)
 	'''
 	if x==True:
 		img = np.flip(img, axis=1)
@@ -93,25 +84,6 @@ def filpFun(img, x, y, z):
 		img = np.flip(img, axis=3)
 
 	return img
-
-def upSampleFun(img, level, order):
-	'''
-	Args:
-		img: shape [1, X, Y, Z]
-		level: scaling factor of downsampling
-		order: 3 for image, 0 for label
-	Ret:
-		imgout: down sampled image of shape [1, X//level, Y//level, Z//level]
-	'''
-	if level == 1:
-		return img
-	else:
-		_, x, y, z = img.shape
-
-		imgout = np.zeros([1, x*level, y*level, z*level], dtype=np.float32)
-		Matrix = np.array([[1/level, 0, 0, 0],[0, 1/level, 0, 0],[0, 0, 1/level, 0],[0, 0, 0, 1]])
-		imgout[0] = affine_transform(img[0], Matrix, output_shape=imgout[0].shape, order=order)
-		return imgout
 
 def downSampleFun(img, level, order):
 	'''
@@ -125,11 +97,12 @@ def downSampleFun(img, level, order):
 	if level == 1:
 		return img
 	else:
-		_, x, y, z = img.shape
+		C, x, y, z = img.shape
 
-		imgout = np.zeros([1, x//level, y//level, z//level], dtype=np.float32)
+		imgout = np.zeros([C, x//level, y//level, z//level], dtype=np.float32)
 		Matrix = np.array([[level, 0, 0, 0],[0, level, 0, 0],[0, 0, level, 0],[0, 0, 0, 1]])
-		imgout[0] = affine_transform(img[0], Matrix, output_shape=imgout[0].shape, order=order)
+		for chan in np.arange(C):
+			imgout[chan] = affine_transform(img[chan], Matrix, output_shape=imgout[chan].shape, order=order)
 		return imgout
 
 class downSample(object):
@@ -145,7 +118,7 @@ class downSample(object):
 
 		image, label = sample['image'], sample['label']
 		return {'image': downSampleFun(image, self.level, 3), \
-				'label': downSampleFun(label, self.level, 0)}
+				'label': label}
 
 class RandomFilp(object):
 	def __init__(self, p):
@@ -156,7 +129,7 @@ class RandomFilp(object):
 		p = self.p
 		image, label = sample['image'], sample['label']
 		return {'image': filpFun(image, (x<p), (y<p), (z<p)), \
-			'label': filpFun(label, (x<p), (y<p), (z<p))}
+			'label': label}
 
 class RandomAffine(object):
 	'''
@@ -174,9 +147,9 @@ class RandomAffine(object):
 
 		image, label = sample['image'], sample['label']
 		return {'image': AffineFun(image, xr, yr, zr, xm, ym, zm, 3), \
-				'label': AffineFun(label, xr, yr, zr, xm, ym, zm, 0)}
+				'label': label}
 
-class niiDataset(Dataset):
+class MTBIDataset(Dataset):
 	'''
 	pytorch dataset for bv segmentation
 	'''
@@ -187,7 +160,6 @@ class niiDataset(Dataset):
 			No Conversion of anykind in a dataset class!
 			transform(callable, default=none): transfrom on a sample
 		'''
-
 		self.img_dict=img_dict
 		self.metric = metric	
 		self.transform=transform
@@ -204,12 +176,12 @@ class niiDataset(Dataset):
 		Override: integer indexing in range from 0 to len(self) exclusive.
 		type: keep as np array
 		'''
-		if mode=='new':
-			image = get_subject_data_new(indice, self.img_dict, self.metric, verbose=False)
+		if self.mode=='new':
+			image = get_subject_data_new(indice, self.img_dict, self.metric, shape=(128, 192, 128), verbose=False)
 			label = get_label_new(indice)
 		else:
 			# mode == all
-			image = get_subject_data_all(indice, self.img_dict, self.metric, verbose=False)
+			image = get_subject_data_all(indice, self.img_dict, self.metric, shape=(128, 192, 128), verbose=False)
 			label = get_label_all(indice)
 
 		sample = {'image':image, 'label':label}
