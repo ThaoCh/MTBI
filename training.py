@@ -9,6 +9,15 @@ from scipy.ndimage import affine_transform, zoom
 from niiutility import *
 from scipy.ndimage import affine_transform, zoom, gaussian_filter
 
+def accuracy(output, target):
+    '''
+    Acc helper from Dr.kyamagu:
+    https://gist.github.com/kyamagu/73ab34cbe12f3db807a314019062ad43
+    '''
+    pred = output >= 0.5
+    truth = target >= 0.5
+    acc = pred.eq(truth).sum() / target.numel()
+    return acc
 
 def weights_init(m):
     classname = m.__class__.__name__
@@ -84,10 +93,9 @@ def train(model, traindata, valdata, optimizer, scheduler, device, dtype, lossFu
             # computed by the backwards pass.
             optimizer.step()
             
-        print('Epoch {0} finished ! Training Loss: {1}'.format(e + streopch, epoch_loss / t))
+        print('Epoch {0} finished ! Training Loss: {1:.4f}'.format(e + streopch, epoch_loss / t))
         
-        loss_val = check_accuracy(model, valdata, device, dtype, 
-            cirrculum=cirrculum, lossFun=lossFun)
+        loss_val = check_accuracy(model, valdata, device, dtype, lossFun=lossFun)
         # scheduler.step(loss_val)
            
         # When validation loss < 0.1,upgrade cirrculum, reset scheduler
@@ -101,6 +109,7 @@ def check_accuracy(model, dataloader, device, dtype, lossFun):
     model.eval()  # set model to evaluation mode
     with torch.no_grad():
         loss = 0
+        acc = 0
         N = len(dataloader)
         for t, batch in enumerate(dataloader):
             x = batch['image']
@@ -110,6 +119,7 @@ def check_accuracy(model, dataloader, device, dtype, lossFun):
             scores = model(x)
 
             loss += lossFun(scores, y)
+            acc += accuracy(scores, y)
 
-        print('     validation loss = %.4f' % (loss/N))
+        print('     validation loss = {0:.4f}, accuracy = {0:.4f}'.format (loss/N, acc/N))
         return loss/N

@@ -101,7 +101,9 @@ class InputTransition(nn.Module):
 	def forward(self, x):
 		# do we want a PRELU here as well?
 		out = self.bn1(self.conv1(x))
-		out = self.relu1(torch.add(out, x))
+		# (N, C, X, Y, Z) -> (N, 2C, X, Y, Z)
+		xx = torch.cat((x, x), dim=1)
+		out = self.relu1(torch.add(out, xx))
 
 		return out
 
@@ -127,28 +129,6 @@ class DownTransition(nn.Module):
 		out = self.do1(down)
 		out = self.ops(out)
 		out = self.relu2(torch.add(out, down))
-		return out
-
-class UpTransition(nn.Module):
-	def __init__(self, inChans, outChans, nConvs, elu, dropout=False):
-		super(UpTransition, self).__init__()
-		self.up_conv = nn.ConvTranspose3d(inChans, outChans // 2, kernel_size=2, stride=2)
-		self.bn1 = nn.BatchNorm3d(outChans // 2)
-		self.do1 = passthrough
-		self.do2 = nn.Dropout3d()
-		self.relu1 = ELUCons(elu, outChans // 2)
-		self.relu2 = ELUCons(elu, outChans)
-		if dropout:
-			self.do1 = nn.Dropout3d()
-		self.ops = _make_nConv(outChans, nConvs, elu)
-
-	def forward(self, x, skipx):
-		out = self.do1(x)
-		skipxdo = self.do2(skipx)
-		out = self.relu1(self.bn1(self.up_conv(out)))
-		xcat = torch.cat((out, skipxdo), 1)
-		out = self.ops(xcat)
-		out = self.relu2(torch.add(out, xcat))
 		return out
 
 class OutputTransition(nn.Module):
@@ -206,10 +186,10 @@ class LNet(nn.Module):
 		x, y, z = img_size
 
 		self.in_tr = InputTransition(24, elu)
-		self.down_tr32 = DownTransition(48, 2, elu, dropout=True) # /2
-		self.down_tr64 = DownTransition(96, 3, elu, dropout=True) # /4
-		self.down_tr128 = DownTransition(192, 3, elu, dropout=True) # /8
-		self.down_tr256 = DownTransition(384, 4, elu, dropout=True) # /16
+		self.down_tr32 = DownTransition(24, 2, elu, dropout=True) # /2
+		self.down_tr64 = DownTransition(48, 3, elu, dropout=True) # /4
+		self.down_tr128 = DownTransition(96, 3, elu, dropout=True) # /8
+		self.down_tr256 = DownTransition(192, 4, elu, dropout=True) # /16
 		self.gap = nn.AvgPool3d(kernel_size = (x//16,y//16,z//16)) # N, C, 1, 1, 1
 
 		channel_num = 384
