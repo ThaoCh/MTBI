@@ -11,19 +11,30 @@ from scipy.ndimage import affine_transform, zoom, gaussian_filter
 
 def accuracy(output, target):
     '''
-    Acc helper from Dr.kyamagu:
+    Acc helper translated from Dr.kyamagu:
     https://gist.github.com/kyamagu/73ab34cbe12f3db807a314019062ad43
+    taking input (N, 1)
     '''
-    pred = output >= 0.5
-    truth = target >= 0.5
-    acc = pred.eq(truth).sum() / target.numel()
+    output = (output.cpu()).numpy()
+    target = (target.cpu()).numpy()
+
+    pred = (output >= 0.5).astype(np.float32)
+    truth = (target >= 0.5).astype(np.float32)
+
+    correct = (pred == truth).astype(np.float32)
+
+    acc = np.sum(correct) / correct.shape[0]
     return acc
 
 def weights_init(m):
     classname = m.__class__.__name__
+    
     if classname.find('Conv3d') != -1:
         nn.init.kaiming_normal_(m.weight)
         m.bias.data.zero_()
+
+    if type(m) == nn.Linear:
+        torch.nn.init.xavier_uniform_(m.weight)
 
 def shape_test(model, device, dtype, lossFun, shape):
     
@@ -121,5 +132,5 @@ def check_accuracy(model, dataloader, device, dtype, lossFun):
             loss += lossFun(scores, y)
             acc += accuracy(scores, y)
 
-        print('     validation loss = {0:.4f}, accuracy = {0:.4f}'.format (loss/N, acc/N))
+        print('     validation loss = {0:.4f}, accuracy = {1:.4f}'.format (loss/N, acc/N))
         return loss/N
