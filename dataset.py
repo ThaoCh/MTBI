@@ -18,6 +18,7 @@ def toTensor (sample):
 			labelTensor in [0, 1], (C=3, X, Y, X)
 	'''
 	image, label = sample['image'], sample['label']
+	image -= 0.5 # normalize
 	imageTensor = torch.from_numpy(image.copy()) # copy from memory to avoid minus stride
 	labelTensor = torch.from_numpy(label.copy())
 
@@ -153,13 +154,14 @@ class MTBIDataset(Dataset):
 	'''
 	pytorch dataset for bv segmentation
 	'''
-	def __init__(self, img_dict, metric, transform=None, mode='new'):
+	def __init__(self, shuffle_idx, img_dict, metric, transform=None, mode='new'):
 		'''
 		Args:
 			index of int
 			No Conversion of anykind in a dataset class!
 			transform(callable, default=none): transfrom on a sample
 		'''
+		self.shuffle_idx = shuffle_idx
 		self.img_dict=img_dict
 		self.metric = metric	
 		self.transform=transform
@@ -176,12 +178,14 @@ class MTBIDataset(Dataset):
 		Override: integer indexing in range from 0 to len(self) exclusive.
 		type: keep as np array
 		'''
+		indice = self.shuffle_idx[indice]
+
 		if self.mode=='new':
-			image = get_subject_data_new(indice, self.img_dict, self.metric, shape=(128, 192, 128), verbose=False)
+			image = get_subject_data_new(indice, self.img_dict, self.metric, shape=(64, 96, 64), verbose=False)
 			label = get_label_new(indice)
 		else:
 			# mode == all
-			image = get_subject_data_all(indice, self.img_dict, self.metric, shape=(128, 192, 128), verbose=False)
+			image = get_subject_data_all(indice, self.img_dict, self.metric, shape=(64, 96, 64), verbose=False)
 			label = get_label_all(indice)
 
 		sample = {'image':image, 'label':label}

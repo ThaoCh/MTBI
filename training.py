@@ -9,12 +9,32 @@ from scipy.ndimage import affine_transform, zoom
 from niiutility import *
 from scipy.ndimage import affine_transform, zoom, gaussian_filter
 
+def accuracy(output, target):
+    '''
+    Acc helper translated from Dr.kyamagu:
+    https://gist.github.com/kyamagu/73ab34cbe12f3db807a314019062ad43
+    taking input (N, 1)
+    '''
+    output = (output.cpu()).detach().numpy()
+    target = (target.cpu()).detach().numpy()
+
+    pred = (output >= 0.5).astype(np.float32)
+    truth = (target >= 0.5).astype(np.float32)
+
+    correct = (pred == truth).astype(np.float32)
+
+    acc = np.sum(correct) / correct.shape[0]
+    return acc
 
 def weights_init(m):
     classname = m.__class__.__name__
+    
     if classname.find('Conv3d') != -1:
         nn.init.kaiming_normal_(m.weight)
         m.bias.data.zero_()
+
+    if type(m) == nn.Linear:
+        torch.nn.init.xavier_uniform_(m.weight)
 
 def shape_test(model, device, dtype, lossFun, shape):
     
@@ -57,8 +77,10 @@ def train(model, traindata, valdata, optimizer, scheduler, device, dtype, lossFu
     """
     model = model.to(device=device)  # move the model parameters to CPU/GPU
     model_save_path = 'checkpoint' + str(datetime.datetime.now())+'.pth'
+    N = len(traindata)
     for e in range(epochs):
         epoch_loss = 0
+        acc = 0
         for t, batch in enumerate(traindata):
             model.train()  # put model to training mode
             x = batch['image']
@@ -71,6 +93,7 @@ def train(model, traindata, valdata, optimizer, scheduler, device, dtype, lossFu
 
             # avoid gradient
             epoch_loss += loss.item()
+            acc += accuracy(scores, y) #this is not even a tensor...
 
             # Zero out all of the gradients for the variables which the optimizer
             # will update.
@@ -84,10 +107,9 @@ def train(model, traindata, valdata, optimizer, scheduler, device, dtype, lossFu
             # computed by the backwards pass.
             optimizer.step()
             
-        print('Epoch {0} finished ! Training Loss: {1}'.format(e + streopch, epoch_loss / t))
+        print('Epoch {0} finished ! Training Loss: {1:.4f}, acc: {2:.4f}'.format(e + streopch, epoch_loss/N, acc/N))
         
-        loss_val = check_accuracy(model, valdata, device, dtype, 
-            cirrculum=cirrculum, lossFun=lossFun)
+        loss_val = check_accuracy(model, valdata, device, dtype, lossFun=lossFun)
         # scheduler.step(loss_val)
            
         # When validation loss < 0.1,upgrade cirrculum, reset scheduler
@@ -101,6 +123,7 @@ def check_accuracy(model, dataloader, device, dtype, lossFun):
     model.eval()  # set model to evaluation mode
     with torch.no_grad():
         loss = 0
+        acc = 0
         N = len(dataloader)
         for t, batch in enumerate(dataloader):
             x = batch['image']
@@ -110,6 +133,7 @@ def check_accuracy(model, dataloader, device, dtype, lossFun):
             scores = model(x)
 
             loss += lossFun(scores, y)
+            acc += accuracy(scores, y)
 
-        print('     validation loss = %.4f' % (loss/N))
+        print('     validation loss = {0:.4f}, accuracy = {1:.4f}'.format (loss/N, acc/N))
         return loss/N

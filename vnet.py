@@ -16,6 +16,17 @@ import torch
 import torch.nn as nn
 import torch.nn.functional as F
 
+class Flatten(nn.Module):
+	'''
+	Flatten Module From:
+	https://gist.github.com/VoVAllen/5531c78a2d3f1ff3df772038bca37a83
+	'''
+	def __init__(self):
+		super(Flatten, self).__init__()
+
+	def forward(self, x):
+		return x.view(x.size(0), -1)
+
 def passthrough(x, **kwargs):
 	return x
 
@@ -73,7 +84,7 @@ def _make_rConv(nchan ,depth, elu):
 	layers = []
 	for _ in range(depth):
 		layers.append(ResLUConv(nchan, elu))
-	return nn.Sequential(*layers)
+	return nn.Sequential(*layers)	
 
 def _make_nConv(nchan, depth, elu):
 	'''
@@ -94,14 +105,16 @@ class InputTransition(nn.Module):
 	'''
 	def __init__(self, outChans, elu):
 		super(InputTransition, self).__init__()
-		self.conv1 = nn.Conv3d(12, outChans, kernel_size=5, padding=2)
+		self.conv1 = nn.Conv3d(4, outChans, kernel_size=5, padding=2)
 		self.bn1 = nn.BatchNorm3d(outChans)
 		self.relu1 = ELUCons(elu, outChans)
 
 	def forward(self, x):
 		# do we want a PRELU here as well?
 		out = self.bn1(self.conv1(x))
-		out = self.relu1(torch.add(out, x))
+		# (N, C, X, Y, Z) -> (N, 2C, X, Y, Z)
+		xx = torch.cat((x, x, x, x), dim=1)
+		out = self.relu1(torch.add(out, xx))
 
 		return out
 
@@ -129,66 +142,66 @@ class DownTransition(nn.Module):
 		out = self.relu2(torch.add(out, down))
 		return out
 
-class UpTransition(nn.Module):
-	def __init__(self, inChans, outChans, nConvs, elu, dropout=False):
-		super(UpTransition, self).__init__()
-		self.up_conv = nn.ConvTranspose3d(inChans, outChans // 2, kernel_size=2, stride=2)
-		self.bn1 = nn.BatchNorm3d(outChans // 2)
-		self.do1 = passthrough
-		self.do2 = nn.Dropout3d()
-		self.relu1 = ELUCons(elu, outChans // 2)
-		self.relu2 = ELUCons(elu, outChans)
-		if dropout:
-			self.do1 = nn.Dropout3d()
-		self.ops = _make_nConv(outChans, nConvs, elu)
-
-	def forward(self, x, skipx):
-		out = self.do1(x)
-		skipxdo = self.do2(skipx)
-		out = self.relu1(self.bn1(self.up_conv(out)))
-		xcat = torch.cat((out, skipxdo), 1)
-		out = self.ops(xcat)
-		out = self.relu2(torch.add(out, xcat))
-		return out
-
-class OutputTransition(nn.Module):
-	def __init__(self, inChans, classnum, elu):
-
-		'''
-		Notes: 
-			* converts to number of outputs
-		Args:
-			* inChans: input channels
-			* classnum: number of classes
-		Return:
-			* None
-		'''
-		super(OutputTransition, self).__init__()
-		class_num = 3
-		self.conv1 = nn.Conv3d(inChans, 2, kernel_size=5, padding=2)
-		self.bn1 = nn.BatchNorm3d(2)
-		self.conv2 = nn.Conv3d(2, classnum, kernel_size=1)
-		self.relu1 = ELUCons(elu, 2)
+class FCRB(nn.Module):
+	def __init__(self, in_chan, out_chan):
+		super(FCRB, self).__init__()
+		self.affine = nn.Linear(in_chan, out_chan)
+		self.bn = nn.BatchNorm1d(out_chan)
+		self.relu = nn.ReLU(inplace=True)
+		self.dp = nn.Dropout()
 
 	def forward(self, x):
-		# convolve 32 down to 2 channels
-		out = self.relu1(self.bn1(self.conv1(x)))
-		out = self.conv2(out)
-
-		# out should have shape N, C, X, Y, Z at that time
+		out = self.dp(self.relu(self.bn(self.affine(x))))
 		return out
 
-class FCRB(nn.Module):
-    def __init__(self, in_chan, out_chan):
-        super(FCRB, self).__init__()
-        self.affine = nn.Linear(in_chan, out_chan)
-        self.bn = nn.BatchNorm1d(out_chan)
-        self.relu = nn.ReLU(inplace=True)
-        self.dp = nn.Dropout()
+class LNet1(nn.Module):
+	'''
+	Half V Net
+	'''
+	def __init__(self, img_size, elu=True):
+		'''
+		Args:
+			* slim: using few conv layers, else as original paper
+			* elu: using elu / PReLU
+		'''
+		# 64*96*64 -> 8*12*8 * 128 channels
+		super(LNet1, self).__init__()
 
-    def forward(self, x):
-        out = self.dp(self.relu(self.bn(self.affine(x))))
-        return out
+		x, y, z = img_size
+
+		self.in_tr = InputTransition(16, elu)
+		self.down_tr32 = DownTransition(16, 2, elu, dropout=True) # /2
+		self.down_tr64 = DownTransition(32, 3, elu, dropout=True) # /4
+		self.down_tr128 = DownTransition(64, 3, elu, dropout=True) # /8
+		self.down_tr256 = DownTransition(128, 3, elu, dropout=True) # /16
+
+		self.flat = Flatten()
+
+		channel_num = (x//16)*(y//16)*(z//16)*256
+
+		self.fc1 = FCRB(channel_num, channel_num//128)
+		self.fc2 = nn.Linear(channel_num//128, 1)
+
+		self.sigmoid = nn.Sigmoid()
+
+	def forward(self, x):
+
+		batch_size = x.size()[0] # get batch size
+
+		out = self.in_tr(x)
+		out = self.down_tr32(out)
+		out = self.down_tr64(out)
+		out = self.down_tr128(out)
+		out = self.down_tr256(out)
+		
+		out = self.flat(out)
+		out = self.fc1(out)
+		out = self.fc2(out)
+
+		out = self.sigmoid(out)
+
+		return out
+
 
 class LNet(nn.Module):
 	'''
@@ -205,14 +218,14 @@ class LNet(nn.Module):
 
 		x, y, z = img_size
 
-		self.in_tr = InputTransition(24, elu)
-		self.down_tr32 = DownTransition(48, 2, elu, dropout=True) # /2
-		self.down_tr64 = DownTransition(96, 3, elu, dropout=True) # /4
-		self.down_tr128 = DownTransition(192, 3, elu, dropout=True) # /8
-		self.down_tr256 = DownTransition(384, 4, elu, dropout=True) # /16
+		self.in_tr = InputTransition(32, elu)
+		self.down_tr32 = DownTransition(32, 2, elu, dropout=True) # /2
+		self.down_tr64 = DownTransition(64, 3, elu, dropout=True) # /4
+		self.down_tr128 = DownTransition(128, 3, elu, dropout=True) # /8
+		self.down_tr256 = DownTransition(256, 6, elu, dropout=True) # /16
 		self.gap = nn.AvgPool3d(kernel_size = (x//16,y//16,z//16)) # N, C, 1, 1, 1
 
-		channel_num = 384
+		channel_num = 512
 
 		self.fc1 = FCRB(channel_num, channel_num)
 		self.fc2 = nn.Linear(channel_num, out_size)
@@ -233,5 +246,6 @@ class LNet(nn.Module):
 		out = self.fc1(out)
 		out = self.fc2(out)
 		out = self.sigmoid(out)
+
 
 		return out
