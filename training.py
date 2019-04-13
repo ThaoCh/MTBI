@@ -15,8 +15,8 @@ def accuracy(output, target):
     https://gist.github.com/kyamagu/73ab34cbe12f3db807a314019062ad43
     taking input (N, 1)
     '''
-    output = (output.cpu()).numpy()
-    target = (target.cpu()).numpy()
+    output = (output.cpu()).detach().numpy()
+    target = (target.cpu()).detach().numpy()
 
     pred = (output >= 0.5).astype(np.float32)
     truth = (target >= 0.5).astype(np.float32)
@@ -77,8 +77,10 @@ def train(model, traindata, valdata, optimizer, scheduler, device, dtype, lossFu
     """
     model = model.to(device=device)  # move the model parameters to CPU/GPU
     model_save_path = 'checkpoint' + str(datetime.datetime.now())+'.pth'
+    N = len(traindata)
     for e in range(epochs):
         epoch_loss = 0
+        acc = 0
         for t, batch in enumerate(traindata):
             model.train()  # put model to training mode
             x = batch['image']
@@ -91,6 +93,7 @@ def train(model, traindata, valdata, optimizer, scheduler, device, dtype, lossFu
 
             # avoid gradient
             epoch_loss += loss.item()
+            acc += accuracy(scores, y) #this is not even a tensor...
 
             # Zero out all of the gradients for the variables which the optimizer
             # will update.
@@ -104,7 +107,7 @@ def train(model, traindata, valdata, optimizer, scheduler, device, dtype, lossFu
             # computed by the backwards pass.
             optimizer.step()
             
-        print('Epoch {0} finished ! Training Loss: {1:.4f}'.format(e + streopch, epoch_loss / t))
+        print('Epoch {0} finished ! Training Loss: {1:.4f}, acc: {2:.4f}'.format(e + streopch, epoch_loss/N, acc/N))
         
         loss_val = check_accuracy(model, valdata, device, dtype, lossFun=lossFun)
         # scheduler.step(loss_val)

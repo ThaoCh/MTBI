@@ -181,11 +181,11 @@ class MTBIDataset(Dataset):
 		indice = self.shuffle_idx[indice]
 
 		if self.mode=='new':
-			image = get_subject_data_new(indice, self.img_dict, self.metric, shape=(128, 192, 128), verbose=False)
+			image = get_subject_data_new(indice, self.img_dict, self.metric, shape=(64, 96, 64), verbose=False)
 			label = get_label_new(indice)
 		else:
 			# mode == all
-			image = get_subject_data_all(indice, self.img_dict, self.metric, shape=(128, 192, 128), verbose=False)
+			image = get_subject_data_all(indice, self.img_dict, self.metric, shape=(64, 96, 64), verbose=False)
 			label = get_label_all(indice)
 
 		sample = {'image':image, 'label':label}
