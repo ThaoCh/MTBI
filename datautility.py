@@ -126,6 +126,73 @@ def show_slice(data, N, axis=0):
 			ax[i].imshow(data[:,:,s], cmap='gray')
 	pass
 
+def get_image_subject(name, metric, data_type, verbose=False):
+
+	M = len(metric) # should be 8
+
+	if data_type == 'new':
+		data_metric = np.zeros([M, 88, 88, 54], dtype=np.float32) # shape of new data
+		folder = './data/current_cycle_subj_space_metrics_and_masks/metrics_mat/'
+	elif data_type == 'old':
+		data_metric = np.zeros([M, 82, 82, 28], dtype=np.float32) # shape of new data
+		folder = './data/prior_cycle_subj_space_metrics_and_masks/metrics_mat/'
+	else:
+		print('unsupported data type: {}'.format(data_type))
+
+	for i, m in enumerate(metric):
+		if m == 'eas_De_par' or m == 'ias_Da' or m == 'awf':
+			# WMTI_eas_De_par_TBN040.nii, WMTI_ias_Da_TBI051.nii, WMTI_awf_TBI035.nii, WMTI_ias_Da_TBN020.nii
+			PATH = folder + 'WMTI' + '_' + m + '_' + name + '.nii'
+			pass
+		elif m == 'eas_De_perp':
+			# WMTI_eas_De_perp_TBI012.mat, 
+			PATH = folder + 'WMTI' + '_' + m + '_' + name + '.mat'
+			pass
+		elif  m == 'ak':
+			# DKI_ak_TBI010.mat, 
+			PATH = folder + 'DKI' + '_' + m + '_' + name + '.mat'
+			pass
+		elif m == 'FA' or m =='md' or m =='mk':
+			# DTI_fa_TBI001.nii, DTI_mk_TBI004.nii, DTI_md_TBN031.nii
+			PATH = folder + 'DTI' + '_' + m + '_' + name + '.nii'
+			pass
+		else:
+			print('metric {} is not implemented yet'.format(m))
+
+		data_metric[i] = loadmat(PATH)['vol']
+		if verbose:
+			show_slice(data_metric[i], N=8)
+	return data_metric
+
+def get_mask_subject(name, mask_name, data_type, mask_type='new', verbose=False):
+	N = len(mask_name)
+
+	if data_type == 'old':
+		mask = np.zeros([N, 82, 82, 28], dtype=np.float32)
+		folder = './data/prior_cycle_subj_space_metrics_and_masks/newmask_mat/'
+	elif data_type == 'new':
+		mask = np.zeros([N, 88, 88, 54], dtype=np.float32)
+		folder = './data/current_cycle_subj_space_metrics_and_masks/newmask_mat/'
+	else:
+		print('unsupported data type: {}'.format(data_type))
+
+	if mask_type == 'new':
+
+		mask_neo_path = folder + name + '_JHU-ICBM-7ROI.nii'
+		mask_neo_data = ((nib.load(mask_neo_path)).get_fdata()).astype(np.float32)
+		mask_neo_data = mask_neo_data.squeeze()
+
+		for i in range(mask.shape[0]):
+			mask[i] = (mask_neo_data == i+1).astype(np.float32)
+			if verbose:
+				show_slice(mask[i], N=8)
+	else:
+		print('unsupported data type: {}'.format(mask_type))
+		pass
+
+
+	return mask
+
 def get_image(index, metric, positive, verbose=False):
 	'''
 	get sample of 117 data
