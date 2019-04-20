@@ -170,9 +170,11 @@ def get_mask_subject(name, mask_name, data_type, mask_type='new', verbose=False)
 	if data_type == 'old':
 		mask = np.zeros([N, 82, 82, 28], dtype=np.float32)
 		folder = './data/prior_cycle_subj_space_metrics_and_masks/newmask_mat/'
+		mfolder = './data/prior_cycle_subj_space_metrics_and_masks/mask_mat/'
 	elif data_type == 'new':
 		mask = np.zeros([N, 88, 88, 54], dtype=np.float32)
 		folder = './data/current_cycle_subj_space_metrics_and_masks/newmask_mat/'
+		mfolder = './data/current_cycle_subj_space_metrics_and_masks/mask_mat/'
 	else:
 		print('unsupported data type: {}'.format(data_type))
 
@@ -186,10 +188,18 @@ def get_mask_subject(name, mask_name, data_type, mask_type='new', verbose=False)
 			mask[i] = (mask_neo_data == i+1).astype(np.float32)
 			if verbose:
 				show_slice(mask[i], N=8)
+	elif mask_type == 'old':
+		for i, mname in enumerate(mask_name):
+			if mname == 'thal':
+				PATH = mfolder + name + '_' + mname + '_mask_b0.mat'
+			else:
+				PATH = mfolder + name + '_' + mname + '_mask_b0_fa.mat'
+			mask[i] = data = loadmat(PATH)['vol']
+			if verbose:
+				show_slice(mask[i], N=8)
+
 	else:
 		print('unsupported data type: {}'.format(mask_type))
-		pass
-
 
 	return mask
 
