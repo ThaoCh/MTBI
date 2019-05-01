@@ -115,3 +115,295 @@ maximum test accuracy= 0.323, achieved by using 10 features and ( C, Gamma, eps)
  '4m-CC_Body_mask-FA' 'kut-CC_Genu_mask-ak' 'kut-2_R_thal-ias_Da'
  '3m-CC_Splenium_mask-md' 'std-1_L_thal-ias_Da'
  'kut-CC_Genu_mask-eas_De_par']
+
+
+# Negative - Digit Span Backward T1
+
+## Template Space - Old Mask
+
+## Template Space - New Mask
+
+* 1st iter:
+	maximum test accuracy= 0.464, achieved by using 10 features and ( C, Gamma, eps)= ( 1000.00000, 0.00178, 0.50000) from 14 metrics
+	Selected feature for 3xiter= [ 90. 129. 102.  83. 212. 192. 167. 205. 158. 143.]
+	['eas_De_par-left_caudal-mean' 'eas_De_perp-left_caudal-etrp'
+	 'eas_De_par-corpus_callosum-skew' 'eas_De_par-left_middle-kurt'
+	 'md-left_rostral-skew' 'ias_Da-right_middle-skew' 'FA-right_caudal-skew'
+	 'ias_Da-corpus_callosum-mean' 'FA-right_middle-kurt'
+	 'FA-left_rostral-kurt']
+
+* 2nd iter
+	maximum test accuracy= 0.488, achieved by using 27 features and ( C, Gamma, eps)= ( 1000.00000, 0.00178, 0.50000) from 14 metrics
+	Selected feature for 3xiter= [ 90. 129. 102.  83. 212. 192. 167. 205. 158. 143. 239.  97. 276. 134.
+	  70.  29.  10.  31. 124. 181. 229. 186. 119. 139. 279.  69. 146.]
+	['eas_De_par-left_caudal-mean' 'eas_De_perp-left_caudal-etrp'
+	 'eas_De_par-corpus_callosum-skew' 'eas_De_par-left_middle-kurt'
+	 'md-left_rostral-skew' 'ias_Da-right_middle-skew' 'FA-right_caudal-skew'
+	 'ias_Da-corpus_callosum-mean' 'FA-right_middle-kurt'
+	 'FA-left_rostral-kurt' 'md-right_caudal-etrp'
+	 'eas_De_par-right_caudal-skew' 'mk-corpus_callosum-std'
+	 'eas_De_perp-right_caudal-etrp' 'eas_De_par-left_rostral-mean'
+	 'ak-right_caudal-etrp' 'ak-left_middle-mean' 'ak-corpus_callosum-std'
+	 'eas_De_perp-right_middle-etrp' 'ias_Da-right_rostral-std'
+	 'md-right_middle-etrp' 'ias_Da-left_middle-std'
+	 'eas_De_perp-left_middle-etrp' 'eas_De_perp-corpus_callosum-etrp'
+	 'mk-corpus_callosum-etrp' 'awf-corpus_callosum-etrp'
+	 'FA-right_rostral-std']
+
+## Subject Space - Old Mask
+
+* 1st iter:
+maximum test accuracy= 0.610, achieved by using 10 features and ( C, Gamma, eps)= ( 1000.00000, 0.00178, 0.50000) from 14 metrics
+Selected feature for 3xiter= [ 88.  56.  98. 128.  27.  22.  47.  42. 103.  23.]
+['FA-cc_genu-kurt' 'eas_De_par-thal-std' 'FA-thal-kurt' 'md-cc_genu-kurt'
+ 'awf-cc_genu-skew' 'awf-cc_body-skew' 'eas_De_par-cc_genu-skew'
+ 'eas_De_par-cc_body-skew' 'ias_Da-cc_body-kurt' 'awf-cc_body-kurt']
+
+ * 2nd iter:
+ maximum test accuracy= 0.645, achieved by using 22 features and ( C, Gamma, eps)= ( 1000.00000, 0.00178, 0.50000) from 14 metrics
+Selected feature for 3xiter= [ 88.  56.  98. 128.  27.  22.  47.  42. 103.  23. 151.  33.   6.  15.
+   1. 106.  11.  86.  16.  36.  85.  26.]
+['FA-cc_genu-kurt' 'eas_De_par-thal-std' 'FA-thal-kurt' 'md-cc_genu-kurt'
+ 'awf-cc_genu-skew' 'awf-cc_body-skew' 'eas_De_par-cc_genu-skew'
+ 'eas_De_par-cc_body-skew' 'ias_Da-cc_body-kurt' 'awf-cc_body-kurt'
+ 'mk-cc_splenium-std' 'awf-cc_splenium-kurt' 'ak-cc_genu-std'
+ 'ak-thal-mean' 'ak-cc_body-std' 'ias_Da-cc_genu-std' 'ak-cc_splenium-std'
+ 'FA-cc_genu-std' 'ak-thal-std' 'awf-thal-std' 'FA-cc_genu-mean'
+ 'awf-cc_genu-std']
+
+## Subject Space - New Mask
+
+* 1st iter:
+maximum test accuracy= 0.583, achieved by using 10 features and ( C, Gamma, eps)= ( 1000.00000, 0.31623, 0.50000) from 14 metrics
+Selected feature for 3xiter= [195. 102. 150. 155.  41. 149.  10.  49. 246. 186.]
+['ias_Da-left_caudal-mean' 'eas_De_par-corpus_callosum-skew'
+ 'FA-left_middle-mean' 'FA-right_middle-mean' 'awf-right_rostral-std'
+ 'FA-right_rostral-etrp' 'ak-left_middle-mean' 'awf-left_middle-etrp'
+ 'mk-left_rostral-std' 'ias_Da-left_middle-std']
+
+2nd iter:
+maximum test accuracy= 0.678, achieved by using 16 features and ( C, Gamma, eps)= ( 1000.00000, 0.31623, 0.50000) from 14 metrics
+Selected feature for 3xiter= [195. 102. 150. 155.  41. 149.  10.  49. 246. 186. 220.  80. 171. 161.
+  31.  51.]
+['ias_Da-left_caudal-mean' 'eas_De_par-corpus_callosum-skew'
+ 'FA-left_middle-mean' 'FA-right_middle-mean' 'awf-right_rostral-std'
+ 'FA-right_rostral-etrp' 'ak-left_middle-mean' 'awf-left_middle-etrp'
+ 'mk-left_rostral-std' 'ias_Da-left_middle-std' 'md-left_middle-mean'
+ 'eas_De_par-left_middle-mean' 'FA-corpus_callosum-std'
+ 'FA-left_caudal-std' 'ak-corpus_callosum-std' 'awf-right_middle-std']
+
+# Negative - Letter Number T1
+
+## Subject Space - New Mask
+
+* 1st iter:
+
+maximum test accuracy= 0.497, achieved by using 10 features and ( C, Gamma, eps)= ( 10000.00000, 0.00178, 0.05000) from 14 metrics
+Selected feature for 3xiter= [197. 172.  91. 248.  26.  76.   5.  53. 162. 196.]
+['ias_Da-left_caudal-skew' 'FA-corpus_callosum-skew'
+ 'eas_De_par-left_caudal-std' 'mk-left_rostral-kurt' 'ak-right_caudal-std'
+ 'eas_De_par-right_rostral-std' 'ak-right_rostral-mean'
+ 'awf-right_middle-kurt' 'FA-left_caudal-skew' 'ias_Da-left_caudal-std']
+
+* 2nd iter:
+
+maximum test accuracy= 0.504, achieved by using 12 features and ( C, Gamma, eps)= ( 10000.00000, 0.00178, 0.05000) from 14 metrics
+Selected feature for 3xiter= [197. 172.  91. 248.  26.  76.   5.  53. 162. 196.  61. 146.]
+['ias_Da-left_caudal-skew' 'FA-corpus_callosum-skew'
+ 'eas_De_par-left_caudal-std' 'mk-left_rostral-kurt' 'ak-right_caudal-std'
+ 'eas_De_par-right_rostral-std' 'ak-right_rostral-mean'
+ 'awf-right_middle-kurt' 'FA-left_caudal-skew' 'ias_Da-left_caudal-std'
+ 'awf-right_caudal-std' 'FA-right_rostral-std']
+
+
+## Subject Space - Old Mask
+
+1st iter:
+maximum test accuracy= 0.221, achieved by using 10 features and ( C, Gamma, eps)= ( 1000.00000, 0.00178, 0.50000) from 14 metrics
+Selected feature for 3xiter= [118.  88.  40.  76.  46. 115. 111.  85.  51.  42.]
+['ias_Da-thal-kurt' 'FA-cc_genu-kurt' 'eas_De_par-cc_body-mean'
+ 'eas_De_perp-thal-std' 'eas_De_par-cc_genu-std' 'ias_Da-thal-mean'
+ 'ias_Da-cc_splenium-std' 'FA-cc_genu-mean' 'eas_De_par-cc_splenium-std'
+ 'eas_De_par-cc_body-skew']
+
+2nd iter:
+
+maximum test accuracy= 0.263, achieved by using 18 features and ( C, Gamma, eps)= ( 1000.00000, 0.00178, 0.50000) from 14 metrics
+Selected feature for 3xiter= [118.  88.  40.  76.  46. 115. 111.  85.  51.  42. 108.  22. 106. 101.
+  41. 126.  66.  81.]
+['ias_Da-thal-kurt' 'FA-cc_genu-kurt' 'eas_De_par-cc_body-mean'
+ 'eas_De_perp-thal-std' 'eas_De_par-cc_genu-std' 'ias_Da-thal-mean'
+ 'ias_Da-cc_splenium-std' 'FA-cc_genu-mean' 'eas_De_par-cc_splenium-std'
+ 'eas_De_par-cc_body-skew' 'ias_Da-cc_genu-kurt' 'awf-cc_body-skew'
+ 'ias_Da-cc_genu-std' 'ias_Da-cc_body-std' 'eas_De_par-cc_body-std'
+ 'md-cc_genu-std' 'eas_De_perp-cc_genu-std' 'FA-cc_body-std']
+total time= 67.17274856567383
+
+## Template Space - New Mask
+1st iter:
+maximum test accuracy= 0.492, achieved by using 10 features and ( C, Gamma, eps)= ( 31.62278, 0.31623, 0.50000) from 14 metrics
+Selected feature for 3xiter= [258. 182. 121.  52. 246.  20.  40. 191. 141.  36.]
+['mk-left_middle-kurt' 'ias_Da-right_rostral-skew'
+ 'eas_De_perp-right_middle-std' 'awf-right_middle-skew'
+ 'mk-left_rostral-std' 'ak-left_caudal-mean' 'awf-right_rostral-mean'
+ 'ias_Da-right_middle-std' 'FA-left_rostral-std' 'awf-left_rostral-std']
+ 
+ 2nd iter:
+ maximum test accuracy= 0.527, achieved by using 42 features and ( C, Gamma, eps)= ( 31.62278, 0.31623, 0.50000) from 14 metrics
+Selected feature for 3xiter= [258. 182. 121.  52. 246.  20.  40. 191. 141.  36. 176. 174. 209.  69.
+ 244. 104. 161. 151.  41. 279.  46. 171. 156. 251. 166.  51. 146.   4.
+ 150. 186. 170. 181.  31.  34.  56. 100.   5.  13.  86. 241.  25. 206.]
+['mk-left_middle-kurt' 'ias_Da-right_rostral-skew'
+ 'eas_De_perp-right_middle-std' 'awf-right_middle-skew'
+ 'mk-left_rostral-std' 'ak-left_caudal-mean' 'awf-right_rostral-mean'
+ 'ias_Da-right_middle-std' 'FA-left_rostral-std' 'awf-left_rostral-std'
+ 'ias_Da-left_rostral-std' 'FA-corpus_callosum-etrp'
+ 'ias_Da-corpus_callosum-etrp' 'awf-corpus_callosum-etrp'
+ 'md-corpus_callosum-etrp' 'eas_De_par-corpus_callosum-etrp'
+ 'FA-left_caudal-std' 'FA-left_middle-std' 'awf-right_rostral-std'
+ 'mk-corpus_callosum-etrp' 'awf-left_middle-std' 'FA-corpus_callosum-std'
+ 'FA-right_middle-std' 'mk-right_rostral-std' 'FA-right_caudal-std'
+ 'awf-right_middle-std' 'FA-right_rostral-std' 'ak-left_rostral-etrp'
+ 'FA-left_middle-mean' 'ias_Da-left_middle-std' 'FA-corpus_callosum-mean'
+ 'ias_Da-right_rostral-std' 'ak-corpus_callosum-std'
+ 'ak-corpus_callosum-etrp' 'awf-left_caudal-std'
+ 'eas_De_par-corpus_callosum-mean' 'ak-right_rostral-mean'
+ 'ak-left_middle-kurt' 'eas_De_par-right_middle-std'
+ 'md-corpus_callosum-std' 'ak-right_caudal-mean'
+ 'ias_Da-corpus_callosum-std']
+
+## Template Space - Old Mask
+1st iter:
+maximum test accuracy= 0.388, achieved by using 9 features and ( C, Gamma, eps)= ( 31.62278, 56.23413, 0.50000) from 14 metrics
+Selected feature for 3xiter= [158.  68.  31. 199. 129. 140. 124.  66. 189.]
+['FA-CC_Genu_mask-kurt' 'awf-R_Pref-kurt' 'ak-R_Pref-std'
+ 'ias_Da-CC_Splenium_mask-etrp' 'eas_De_perp-CC_Splenium_mask-etrp'
+ 'FA-1_L_thal-mean' 'eas_De_perp-CC_Genu_mask-etrp' 'awf-R_Pref-std'
+ 'ias_Da-CC_Body_mask-etrp']
+total time= 707.6866717338562
+
+
+# All - Digit Span Backward T1
+
+## Subject Space - New Mask
+1st iter: maximum test accuracy= 0.394, achieved by using 10 features and ( C, Gamma, eps)= ( 1.00000, 0.31623, 0.05000) from 14 metrics
+Selected feature for 3xiter= [ 32.  98. 197.  95. 163.  94. 137.  12. 248. 208.]
+['ak-corpus_callosum-skew' 'eas_De_par-right_caudal-kurt'
+ 'ias_Da-left_caudal-skew' 'eas_De_par-right_caudal-mean'
+ 'FA-left_caudal-kurt' 'eas_De_par-left_caudal-etrp'
+ 'eas_De_perp-corpus_callosum-skew' 'ak-left_middle-skew'
+ 'mk-left_rostral-kurt' 'ias_Da-corpus_callosum-kurt']
+
+2nd iter:
+maximum test accuracy= 0.418, achieved by using 37 features and ( C, Gamma, eps)= ( 1.00000, 0.31623, 0.05000) from 14 metrics
+Selected feature for 3xiter= [ 32.  98. 197.  95. 163.  94. 137.  12. 248. 208.  17. 195. 177. 224.
+ 147.  96. 271. 152. 205.  55. 165. 200. 157.  11.  61.  10. 160.  16.
+  26. 166.  45.  60. 146.  56. 176. 171. 161.]
+['ak-corpus_callosum-skew' 'eas_De_par-right_caudal-kurt'
+ 'ias_Da-left_caudal-skew' 'eas_De_par-right_caudal-mean'
+ 'FA-left_caudal-kurt' 'eas_De_par-left_caudal-etrp'
+ 'eas_De_perp-corpus_callosum-skew' 'ak-left_middle-skew'
+ 'mk-left_rostral-kurt' 'ias_Da-corpus_callosum-kurt'
+ 'ak-right_middle-skew' 'ias_Da-left_caudal-mean'
+ 'ias_Da-left_rostral-skew' 'md-left_middle-etrp' 'FA-right_rostral-skew'
+ 'eas_De_par-right_caudal-std' 'mk-right_caudal-std' 'FA-left_middle-skew'
+ 'ias_Da-corpus_callosum-mean' 'awf-left_caudal-mean'
+ 'FA-right_caudal-mean' 'ias_Da-right_caudal-mean' 'FA-right_middle-skew'
+ 'ak-left_middle-std' 'awf-right_caudal-std' 'ak-left_middle-mean'
+ 'FA-left_caudal-mean' 'ak-right_middle-std' 'ak-right_caudal-std'
+ 'FA-right_caudal-std' 'awf-left_middle-mean' 'awf-right_caudal-mean'
+ 'FA-right_rostral-std' 'awf-left_caudal-std' 'ias_Da-left_rostral-std'
+ 'FA-corpus_callosum-std' 'FA-left_caudal-std']
+
+## Subject Space - Old Mask
+1st iter:
+
+maximum test accuracy= 0.377, achieved by using 10 features and ( C, Gamma, eps)= ( 31.62278, 0.31623, 0.05000) from 14 metrics
+Selected feature for 3xiter= [154. 163. 137. 271. 258. 262. 236.   2. 131. 169.]
+['FA-left_middle-etrp' 'FA-left_caudal-kurt'
+ 'eas_De_perp-corpus_callosum-skew' 'mk-right_caudal-std'
+ 'mk-left_middle-kurt' 'mk-right_middle-skew' 'md-right_caudal-std'
+ 'ak-left_rostral-skew' 'eas_De_perp-right_caudal-std'
+ 'FA-right_caudal-etrp']
+
+## Template Space - New Mask
+
+maximum test accuracy= 0.394, achieved by using 10 features and ( C, Gamma, eps)= ( 1.00000, 0.31623, 0.05000) from 14 metrics
+Selected feature for 3xiter= [ 32.  98. 197.  95. 163.  94. 137.  12. 248. 208.]
+['ak-corpus_callosum-skew' 'eas_De_par-right_caudal-kurt'
+ 'ias_Da-left_caudal-skew' 'eas_De_par-right_caudal-mean'
+ 'FA-left_caudal-kurt' 'eas_De_par-left_caudal-etrp'
+ 'eas_De_perp-corpus_callosum-skew' 'ak-left_middle-skew'
+ 'mk-left_rostral-kurt' 'ias_Da-corpus_callosum-kurt']
+total time= 2452.376142978668
+
+## Template Space - Old Mask
+
+
+# All - Letter Number T1
+
+## Template Space - New Mask
+
+1st iter:
+maximum test accuracy= 0.335, achieved by using 10 features and ( C, Gamma, eps)= ( 1000.00000, 0.31623, 0.05000) from 14 metrics
+Selected feature for 3xiter= [ 30. 246. 168.  20. 160. 261. 145. 201.  21. 196.]
+['ak-corpus_callosum-mean' 'mk-left_rostral-std' 'FA-right_caudal-kurt'
+ 'ak-left_caudal-mean' 'FA-left_caudal-mean' 'mk-right_middle-std'
+ 'FA-right_rostral-mean' 'ias_Da-right_caudal-std' 'ak-left_caudal-std'
+ 'ias_Da-left_caudal-std']
+
+2nd iter
+maximum test accuracy= 0.348, achieved by using 12 features and ( C, Gamma, eps)= ( 500.00000, 0.31623, 0.05000) from 14 metrics
+Selected feature for 3xiter= [ 30. 246. 168.  20. 160.  86.   7. 186.  56.  76. 156.  26.]
+['ak-corpus_callosum-mean' 'mk-left_rostral-std' 'FA-right_caudal-kurt'
+ 'ak-left_caudal-mean' 'FA-left_caudal-mean' 'eas_De_par-right_middle-std'
+ 'ak-right_rostral-skew' 'ias_Da-left_middle-std' 'awf-left_caudal-std'
+ 'eas_De_par-right_rostral-std' 'FA-right_middle-std'
+ 'ak-right_caudal-std']
+
+## Subject Space - New Mask
+
+maximum test accuracy= 0.475, achieved by using 24 features and ( C, Gamma, eps)= ( 31.62278, 0.31623, 0.05000) from 14 metrics
+Selected feature for 3xiter= [163.  32.  62. 158.  78. 160. 196.  31. 176. 166.  11.  56.  16.  36.
+  35. 161. 141.  41. 146. 171.  86. 206.   1.  61.]
+['FA-left_caudal-kurt' 'ak-corpus_callosum-skew' 'awf-right_caudal-skew'
+ 'FA-right_middle-kurt' 'eas_De_par-right_rostral-kurt'
+ 'FA-left_caudal-mean' 'ias_Da-left_caudal-std' 'ak-corpus_callosum-std'
+ 'ias_Da-left_rostral-std' 'FA-right_caudal-std' 'ak-left_middle-std'
+ 'awf-left_caudal-std' 'ak-right_middle-std' 'awf-left_rostral-std'
+ 'awf-left_rostral-mean' 'FA-left_caudal-std' 'FA-left_rostral-std'
+ 'awf-right_rostral-std' 'FA-right_rostral-std' 'FA-corpus_callosum-std'
+ 'eas_De_par-right_middle-std' 'ias_Da-corpus_callosum-std'
+ 'ak-left_rostral-std' 'awf-right_caudal-std']
+
+## Template Space - Old Mask
+
+maximum test accuracy= 0.223, achieved by using 10 features and ( C, Gamma, eps)= ( 31.62278, 0.31623, 0.05000) from 14 metrics
+Selected feature for 3xiter= [195. 163. 272. 157. 180. 167.  82. 186. 190. 185.]
+['ias_Da-CC_Splenium_mask-mean' 'FA-CC_Splenium_mask-kurt'
+ 'mk-L_Pref-skew' 'FA-CC_Genu_mask-skew' 'ias_Da-2_R_thal-mean'
+ 'FA-L_Pref-skew' 'eas_De_par-CC_Body_mask-skew' 'ias_Da-CC_Body_mask-std'
+ 'ias_Da-CC_Genu_mask-mean' 'ias_Da-CC_Body_mask-mean']
+
+## Subject Space - Old Mask
+maximum test accuracy= 0.368, achieved by using 10 features and ( C, Gamma, eps)= ( 31.62278, 0.31623, 0.05000) from 14 metrics
+Selected feature for 3xiter= [105.  78.   9. 150.  11.   0.  52. 110. 145.  91.]
+['ias_Da-cc_genu-mean' 'eas_De_perp-thal-kurt' 'ak-cc_genu-etrp'
+ 'mk-cc_splenium-mean' 'ak-cc_splenium-std' 'ak-cc_body-mean'
+ 'eas_De_par-cc_splenium-skew' 'ias_Da-cc_splenium-mean' 'mk-cc_genu-mean'
+ 'FA-cc_splenium-std']
+
+
+ Some Courious result using random forest
+
+ ( 500 , 0.31623 ) value of (C, Gamma), and best feat indices= [245]
+maximum test accuracy= 0.454, achieved by using 1 features and ( C, Gamma, eps)= ( 500.00000, 0.31623, 0.05000) from 14 metrics
+Selected feature for 3xiter= [245.]
+['mk-left_rostral-mean']
+total time= 116.95876502990723
+
+maximum test accuracy= 0.493, achieved by using 6 features and ( C, Gamma, eps)= ( 500.00000, 0.31623, 0.05000) from 14 metrics
+Selected feature for 3xiter= [236. 198.  32. 132.  26. 133.]
+['md-right_caudal-std' 'ias_Da-left_caudal-kurt' 'ak-corpus_callosum-skew'
+ 'eas_De_perp-right_caudal-skew' 'ak-right_caudal-std'
+ 'eas_De_perp-right_caudal-kurt']
