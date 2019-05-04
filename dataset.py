@@ -150,6 +150,55 @@ class RandomAffine(object):
 		return {'image': AffineFun(image, xr, yr, zr, xm, ym, zm, 3), \
 				'label': label}
 
+class MTBIDatasetSub(Dataset):
+	'''
+	pytorch dataset for bv segmentation
+	'''
+	def __init__(self, new_index, shuffle_index, metric, transform=None):
+		'''
+		Args:
+			index of int
+			No Conversion of anykind in a dataset class!
+			transform(callable, default=none): transfrom on a sample
+		'''
+		self.new_index = new_index
+		self.shuffle_index = shuffle_index
+		self.metric = metric
+		self.transform = transform
+
+	def __len__(self):
+		'''
+		Override: return size of dataset
+		'''
+		return len(self.new_index)
+
+	def __getitem__(self, indice):
+		'''
+		Override: integer indexing in range from 0 to len(self) exclusive.
+		type: keep as np array
+		'''
+
+		name = self.new_index[indice] # Hummm complicated
+		# image = np.zeros([8,96,96,96])
+		image = get_image_subject(name, self.metric, 'new', shape=(96, 96, 96), verbose=False)
+
+		if name[2] == 'I':
+			# Positive
+			label = np.array([1])
+		
+		else:
+			# Negative
+			label = np.array([0])
+		
+		sample = {'image':image, 'label':label}
+
+		if self.transform:
+			sample = self.transform(sample)
+
+		sample = toTensor(sample)
+
+		return sample
+
 class MTBIDataset(Dataset):
 	'''
 	pytorch dataset for bv segmentation
@@ -196,4 +245,5 @@ class MTBIDataset(Dataset):
 		sample = toTensor(sample)
 
 		return sample
+
 
