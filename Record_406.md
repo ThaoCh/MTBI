@@ -192,6 +192,24 @@ Selected feature for 3xiter= [195. 102. 150. 155.  41. 149.  10.  49. 246. 186. 
  'eas_De_par-left_middle-mean' 'FA-corpus_callosum-std'
  'FA-left_caudal-std' 'ak-corpus_callosum-std' 'awf-right_middle-std']
 
+## Subject Space - New Mask - NN
+
+maximum test accuracy= 0.708, achieved by using 19 features and (Hu, Alpha, eps)= ( 10.00000, 0.01000, 0.00000) from 14 metrics
+Selected feature for 3xiter= [195. 225. 102.  94. 119.  70. 196. 124.  68. 112.  30. 143. 141.  45.
+  54.   1. 191. 171. 184.]
+['ias_Da-left_caudal-mean' 'md-right_middle-mean'
+ 'eas_De_par-corpus_callosum-skew' 'eas_De_par-left_caudal-etrp'
+ 'eas_De_perp-left_middle-etrp' 'eas_De_par-left_rostral-mean'
+ 'ias_Da-left_caudal-std' 'eas_De_perp-right_middle-etrp'
+ 'awf-corpus_callosum-kurt' 'eas_De_perp-right_rostral-skew'
+ 'ak-corpus_callosum-mean' 'FA-left_rostral-kurt' 'FA-left_rostral-std'
+ 'awf-left_middle-mean' 'awf-right_middle-etrp' 'ak-left_rostral-std'
+ 'ias_Da-right_middle-std' 'FA-corpus_callosum-std'
+ 'ias_Da-right_rostral-etrp']
+
+
+
+
 # Negative - Letter Number T1
 
 ## Subject Space - New Mask
@@ -214,6 +232,16 @@ Selected feature for 3xiter= [197. 172.  91. 248.  26.  76.   5.  53. 162. 196. 
  'eas_De_par-right_rostral-std' 'ak-right_rostral-mean'
  'awf-right_middle-kurt' 'FA-left_caudal-skew' 'ias_Da-left_caudal-std'
  'awf-right_caudal-std' 'FA-right_rostral-std']
+
+## Subject Space - New Mask - NN
+
+( 1000.0 , 0.01 ) value of (Hu, Alpha), and best feat indices= [196 162  26 246 262 201  35 206  79 157]
+maximum test accuracy= 0.633, achieved by using 8 features and (Hu, Alpha, eps)= ( 100.00000, 0.01000, 0.00000) from 14 metrics
+Selected feature for 3xiter= [ 32. 186. 137. 180. 156. 221. 205. 196.]
+['ak-corpus_callosum-skew' 'ias_Da-left_middle-std'
+ 'eas_De_perp-corpus_callosum-skew' 'ias_Da-right_rostral-mean'
+ 'FA-right_middle-std' 'md-left_middle-std' 'ias_Da-corpus_callosum-mean'
+ 'ias_Da-left_caudal-std']
 
 
 ## Subject Space - Old Mask
