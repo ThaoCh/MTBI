@@ -51,7 +51,7 @@ def shape_test(model, device, dtype, lossFun, shape):
     # print(scores.size())
     loss = lossFun(x, y, cirrculum=2)
 
-def loadckp (model, optimizer, scheduler, filename, device):
+def loadckp (model, optimizer, scheduler, logger, filename, device):
     model = model.to(device=device)
     if os.path.isfile(filename):
         print("loading checkpoint '{}'".format(filename))
@@ -60,14 +60,15 @@ def loadckp (model, optimizer, scheduler, filename, device):
         model.load_state_dict(checkpoint['state_dict'])
         optimizer.load_state_dict(checkpoint['optimizer'])
         scheduler.load_state_dict(checkpoint['scheduler'])
+        logger = checkpoint['logger']
         print("loaded checkpoint '{}' (epoch {})"
                   .format(filename, checkpoint['epoch']))
     else:
         print("no checkpoint found at '{}'".format(filename))
 
-    return model, optimizer, scheduler
+    pass
 
-def train(model, traindata, valdata, optimizer, scheduler, device, dtype, lossFun, epochs=1, streopch=0):
+def train(model, traindata, valdata, optimizer, scheduler, device, dtype, lossFun, logger, epochs=1, streopch=0):
     """
     Train a model with an optimizer
     
@@ -114,12 +115,15 @@ def train(model, traindata, valdata, optimizer, scheduler, device, dtype, lossFu
         
         loss_val = check_accuracy(model, valdata, device, dtype, lossFun=lossFun)
         # scheduler.step(loss_val)
-           
+
+        logger['train'].append(epoch_loss/N)
+        logger['validation'].append(loss_val)
+
         # When validation loss < 0.1,upgrade cirrculum, reset scheduler
         if (e + streopch) % 50 == 0:
             model_save_path = 'checkpoint' + str(datetime.datetime.now())+'.pth'
             state = {'epoch': e + streopch + 1, 'state_dict': model.state_dict(),
-                'optimizer': optimizer.state_dict(), 'scheduler': scheduler.state_dict()}
+                'optimizer': optimizer.state_dict(), 'scheduler': scheduler.state_dict(), 'logger': logger}
             torch.save(state, model_save_path)
             print('Checkpoint {} saved !'.format(e + streopch + 1))
         
