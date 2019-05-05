@@ -435,3 +435,60 @@ Selected feature for 3xiter= [236. 198.  32. 132.  26. 133.]
 ['md-right_caudal-std' 'ias_Da-left_caudal-kurt' 'ak-corpus_callosum-skew'
  'eas_De_perp-right_caudal-skew' 'ak-right_caudal-std'
  'eas_De_perp-right_caudal-kurt']
+
+## Digital Span Forward - New Mask - Subject Space
+
+SVM:
+maximum test accuracy= 0.451, achieved by using 10 features and ( C, Gamma, eps)= ( 1.00000, 0.31623, 0.05000) from 14 metrics
+Selected feature for 3xiter= [258. 263.  87. 268.  68.  92.  58. 208. 257.  48.]
+['mk-left_middle-kurt' 'mk-right_middle-kurt'
+ 'eas_De_par-right_middle-skew' 'mk-left_caudal-kurt'
+ 'awf-corpus_callosum-kurt' 'eas_De_par-left_caudal-skew'
+ 'awf-left_caudal-kurt' 'ias_Da-corpus_callosum-kurt'
+ 'mk-left_middle-skew' 'awf-left_middle-kurt']
+
+maximum test accuracy= 0.469, achieved by using 15 features and ( C, Gamma, eps)= ( 1.00000, 0.31623, 0.05000) from 14 metrics
+Selected feature for 3xiter= [258. 263.  87. 268.  68.  92.  58. 208. 257.  48. 162.  96. 236. 182.
+ 187.]
+['mk-left_middle-kurt' 'mk-right_middle-kurt'
+ 'eas_De_par-right_middle-skew' 'mk-left_caudal-kurt'
+ 'awf-corpus_callosum-kurt' 'eas_De_par-left_caudal-skew'
+ 'awf-left_caudal-kurt' 'ias_Da-corpus_callosum-kurt'
+ 'mk-left_middle-skew' 'awf-left_middle-kurt' 'FA-left_caudal-skew'
+ 'eas_De_par-right_caudal-std' 'md-right_caudal-std'
+ 'ias_Da-right_rostral-skew' 'ias_Da-left_middle-skew']
+
+
+( 20 , 0.2 ) value of (Hu, Alpha), and best feat indices= [228  90 126  48 119  67 124 259 162 148]
+maximum test accuracy= 0.487, achieved by using 10 features and (Hu, Alpha, eps)= ( 20.00000, 0.20000, 0.00000) from 14 metrics
+Selected feature for 3xiter= [228.  90. 126.  48. 119.  67. 124. 259. 162. 148.]
+['md-right_middle-kurt' 'eas_De_par-left_caudal-mean'
+ 'eas_De_perp-left_caudal-std' 'awf-left_middle-kurt'
+ 'eas_De_perp-left_middle-etrp' 'awf-corpus_callosum-skew'
+ 'eas_De_perp-right_middle-etrp' 'mk-left_middle-etrp'
+ 'FA-left_caudal-skew' 'FA-right_rostral-kurt']
+
+
+
+
+DSP back MRMR100
+
+maximum test accuracy= 0.646, achieved by using 18 features and ( C, Gamma, eps)= ( 31.62278, 0.31623, 0.05000) from 14 metrics
+Selected feature for 3xiter= [ 4. 78. 62. 14. 38.  6. 23. 91.  8. 26. 95. 67. 71. 70. 72. 98. 35. 93.]
+['ak-left_rostral-etrp' 'eas_De_par-right_rostral-kurt'
+ 'awf-right_caudal-skew' 'ak-left_middle-etrp' 'awf-left_rostral-kurt'
+ 'ak-right_rostral-std' 'ak-left_caudal-kurt' 'eas_De_par-left_caudal-std'
+ 'ak-right_rostral-kurt' 'ak-right_caudal-std'
+ 'eas_De_par-right_caudal-mean' 'awf-corpus_callosum-skew'
+ 'eas_De_par-left_rostral-std' 'eas_De_par-left_rostral-mean'
+ 'eas_De_par-left_rostral-skew' 'eas_De_par-right_caudal-kurt'
+ 'awf-left_rostral-mean' 'eas_De_par-left_caudal-kurt']
+
+maximum test accuracy= 0.570, achieved by using 17 features and ( C, Gamma, eps)= ( 1000.00000, 0.00178, 0.50000) from 14 metrics
+Selected feature for 3xiter= [ 4. 10. 14.  8. 30. 47. 45. 19. 28. 25. 38. 40. 15. 26. 35. 37. 33.]
+['ak-left_rostral-etrp' 'ak-left_middle-mean' 'ak-left_middle-etrp'
+ 'ak-right_rostral-kurt' 'ak-corpus_callosum-mean' 'awf-left_middle-skew'
+ 'awf-left_middle-mean' 'ak-right_middle-etrp' 'ak-right_caudal-kurt'
+ 'ak-right_caudal-mean' 'awf-left_rostral-kurt' 'awf-right_rostral-mean'
+ 'ak-right_middle-mean' 'ak-right_caudal-std' 'awf-left_rostral-mean'
+ 'awf-left_rostral-skew' 'ak-corpus_callosum-kurt']
