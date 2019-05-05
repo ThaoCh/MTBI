@@ -124,10 +124,12 @@ def show_slice(data, N, axis=0):
 			ax[i].imshow(data[:,s,:], cmap='gray')
 		else:
 			ax[i].imshow(data[:,:,s], cmap='gray')
-	pass
+	pass	
 
-def get_image_subject(name, metric, data_type, verbose=False):
-
+def get_image_subject(name, metric, data_type, shape=None, verbose=False):
+	'''
+	Return M, X, Y, Z
+	'''
 	M = len(metric) # should be 8
 
 	if data_type == 'new':
@@ -140,12 +142,8 @@ def get_image_subject(name, metric, data_type, verbose=False):
 		print('unsupported data type: {}'.format(data_type))
 
 	for i, m in enumerate(metric):
-		if m == 'eas_De_par' or m == 'ias_Da' or m == 'awf':
+		if m == 'eas_De_par' or m == 'ias_Da' or m == 'awf' or m == 'eas_De_perp' or m == 'eas_De_perp':
 			# WMTI_eas_De_par_TBN040.nii, WMTI_ias_Da_TBI051.nii, WMTI_awf_TBI035.nii, WMTI_ias_Da_TBN020.nii
-			PATH = folder + 'WMTI' + '_' + m + '_' + name + '.nii'
-			pass
-		elif m == 'eas_De_perp':
-			# WMTI_eas_De_perp_TBI012.mat, 
 			PATH = folder + 'WMTI' + '_' + m + '_' + name + '.mat'
 			pass
 		elif  m == 'ak':
@@ -154,7 +152,7 @@ def get_image_subject(name, metric, data_type, verbose=False):
 			pass
 		elif m == 'FA' or m =='md' or m =='mk':
 			# DTI_fa_TBI001.nii, DTI_mk_TBI004.nii, DTI_md_TBN031.nii
-			PATH = folder + 'DTI' + '_' + m + '_' + name + '.nii'
+			PATH = folder + 'DTI' + '_' + m + '_' + name + '.mat'
 			pass
 		else:
 			print('metric {} is not implemented yet'.format(m))
@@ -162,7 +160,10 @@ def get_image_subject(name, metric, data_type, verbose=False):
 		data_metric[i] = loadmat(PATH)['vol']
 		if verbose:
 			show_slice(data_metric[i], N=8)
-	return data_metric
+	if shape is None:
+		return data_metric
+	else:
+		return zero_padding(data_metric, *shape)
 
 def get_mask_subject(name, mask_name, data_type, mask_type='new', verbose=False):
 	N = len(mask_name)
