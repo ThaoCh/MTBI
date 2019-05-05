@@ -13,12 +13,15 @@ def accuracy(output, target):
     '''
     Acc helper translated from Dr.kyamagu:
     https://gist.github.com/kyamagu/73ab34cbe12f3db807a314019062ad43
-    taking input (N, 1)
+    taking input (N, 2)
     '''
+    
     output = (output.cpu()).detach().numpy()
     target = (target.cpu()).detach().numpy()
-
-    pred = (output >= 0.5).astype(np.float32)
+    
+    out_one = np.argmax(output, axis=1)
+    
+    pred = (out_one >= 0.5).astype(np.float32)
     truth = (target >= 0.5).astype(np.float32)
 
     correct = (pred == truth).astype(np.float32)
@@ -76,7 +79,6 @@ def train(model, traindata, valdata, optimizer, scheduler, device, dtype, lossFu
     Returns: Nothing, but prints model accuracies during training.
     """
     model = model.to(device=device)  # move the model parameters to CPU/GPU
-    model_save_path = 'checkpoint' + str(datetime.datetime.now())+'.pth'
     N = len(traindata)
     for e in range(epochs):
         epoch_loss = 0
@@ -84,13 +86,14 @@ def train(model, traindata, valdata, optimizer, scheduler, device, dtype, lossFu
         for t, batch in enumerate(traindata):
             model.train()  # put model to training mode
             x = batch['image']
-            y = batch['label']
+            y = batch['label'].view(-1)
             x = x.to(device=device, dtype=dtype)  # move to device, e.g. GPU
-            y = y.to(device=device, dtype=dtype)
-
+            y = y.to(device=device, dtype=torch.long)
+            
             scores = model(x)
+            
             loss = lossFun(scores, y)
-
+            
             # avoid gradient
             epoch_loss += loss.item()
             acc += accuracy(scores, y) #this is not even a tensor...
@@ -114,6 +117,7 @@ def train(model, traindata, valdata, optimizer, scheduler, device, dtype, lossFu
            
         # When validation loss < 0.1,upgrade cirrculum, reset scheduler
         if (e + streopch) % 50 == 0:
+            model_save_path = 'checkpoint' + str(datetime.datetime.now())+'.pth'
             state = {'epoch': e + streopch + 1, 'state_dict': model.state_dict(),
                 'optimizer': optimizer.state_dict(), 'scheduler': scheduler.state_dict()}
             torch.save(state, model_save_path)
@@ -127,11 +131,11 @@ def check_accuracy(model, dataloader, device, dtype, lossFun):
         N = len(dataloader)
         for t, batch in enumerate(dataloader):
             x = batch['image']
-            y = batch['label']
+            y = batch['label'].view(-1)
             x = x.to(device=device, dtype=dtype)  # move to device, e.g. GPU
-            y = y.to(device=device, dtype=dtype)
+            y = y.to(device=device, dtype=torch.long)
             scores = model(x)
-
+            
             loss += lossFun(scores, y)
             acc += accuracy(scores, y)
 

@@ -150,7 +150,7 @@ def get_image_subject(name, metric, data_type, shape=None, verbose=False):
 			# DKI_ak_TBI010.mat, 
 			PATH = folder + 'DKI' + '_' + m + '_' + name + '.mat'
 			pass
-		elif m == 'FA' or m =='md' or m =='mk':
+		elif m == 'fa' or m =='md' or m =='mk':
 			# DTI_fa_TBI001.nii, DTI_mk_TBI004.nii, DTI_md_TBN031.nii
 			PATH = folder + 'DTI' + '_' + m + '_' + name + '.mat'
 			pass
