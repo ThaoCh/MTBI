@@ -19,6 +19,7 @@ def toTensor (sample):
 	'''
 	image, label = sample['image'], sample['label']
 	image -= 0.5 # normalize
+	image *= 255 # to [0,255]
 	imageTensor = torch.from_numpy(image.copy()) # copy from memory to avoid minus stride
 	labelTensor = torch.from_numpy(label.copy())
 
@@ -178,17 +179,17 @@ class MTBIDatasetSub(Dataset):
 		type: keep as np array
 		'''
 
-		name = self.new_index[indice] # Hummm complicated
+		name = self.new_index[self.shuffle_index[indice]] # Hummm complicated
 		# image = np.zeros([8,96,96,96])
 		image = get_image_subject(name, self.metric, 'new', shape=(96, 96, 96), verbose=False)
 
 		if name[2] == 'I':
 			# Positive
-			label = np.array([1])
+			label = np.array([1],dtype=np.int16)
 		
 		else:
 			# Negative
-			label = np.array([0])
+			label = np.array([0],dtype=np.int16)
 		
 		sample = {'image':image, 'label':label}
 
